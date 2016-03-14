@@ -56,6 +56,9 @@ table {
 
 /* header */
 
+.header-wrapper {
+    margin-bottom: 25px;
+}
 .main-header {
     text-align: center;
 }
@@ -64,7 +67,16 @@ h1 {
 }
 
 /* section */
-
+.body-wrapper {
+    margin-bottom: 25px;
+}
+#canva1 {
+    display: block;
+    margin: 0 auto;
+    border: 1px solid black;
+    border-radius: 5px;
+    cursor: crosshair;
+}
 
 
 /* footer */
