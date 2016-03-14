@@ -10,8 +10,8 @@
         canvas: null,
         context: null,
         canvasSize: {
-            width: 800,
-            height: 600
+            width: 640,
+            height: 480
         },
 
         init: function () {
@@ -21,8 +21,13 @@
             this.setDimensions();
         },
         setDimensions: function () {
+            // On définit la taille interne du canvas
             this.context.width = this.canvasSize.width;
             this.context.height = this.canvasSize.height;
+
+            // Ainsi que sa taille visuelle
+            this.canvas.style.width = this.canvasSize.width + "px";
+            this.canvas.style.height = this.canvasSize.height + "px";
 
             console.log(this.context);
         }
