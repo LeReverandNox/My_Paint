@@ -48,3 +48,27 @@ table {
 }
 
 /* My_Paint */
+
+.main-wrapper {
+    width: 900px;
+    margin: 0 auto;
+}
+
+/* header */
+
+.main-header {
+    text-align: center;
+}
+h1 {
+    color: red;
+}
+
+/* section */
+
+
+
+/* footer */
+
+.main-footer {
+    text-align: center;
+}
