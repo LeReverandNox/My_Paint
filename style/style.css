@@ -76,6 +76,9 @@ h1 {
     border: 1px solid black;
     border-radius: 5px;
     cursor: crosshair;
+
+    width: 800px;
+    height: 600px;
 }
 
 
