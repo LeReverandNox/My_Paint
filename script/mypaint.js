@@ -16,7 +16,7 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColorHex: "#af09ef",
+        toolColorHex: "#8A2727",
         toolColorRGB: {
             r: null,
             g: null,
@@ -123,9 +123,9 @@
             inputsHSL[1].value = this.toolColorHSL.s;
             inputsHSL[2].value = this.toolColorHSL.l;
 
-            console.log(this.toolColorHex);
-            console.log(this.toolColorRGB);
-            console.log(this.toolColorHSL);
+            // console.log(this.toolColorHex);
+            // console.log(this.toolColorRGB);
+            // console.log(this.toolColorHSL);
         },
         hexToRGB: function (hex) {
             // On retire le hash et on converti le code hexa en base16
@@ -137,6 +137,11 @@
             RGB.g = hex >> 8 & 0xFF;
             RGB.b = hex & 0xFF;
             return RGB;
+        },
+        rgbToHex: function (rgb) {
+            var bin = rgb.r << 16 | rgb.g << 8 | rgb.b;
+
+            return "#" + bin.toString(16);
         },
         rgbToHSL: function (rgb) {
             var rgb2 = {};
