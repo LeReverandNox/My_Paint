@@ -16,7 +16,7 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColorHex: "#ff00ab",
+        toolColorHex: "#af09ef",
         toolColorRGB: {
             r: null,
             g: null,
@@ -114,6 +114,18 @@
             inputsRGB[1].value = this.toolColorRGB.g;
             inputsRGB[2].value = this.toolColorRGB.b;
 
+            // On converti le RGB en HSL
+            this.toolColorHSL = this.rgbToHSL(this.toolColorRGB);
+
+            // On récupère les inputs RGB et on leur asigne les valeurs RGB
+            var inputsHSL = document.getElementsByClassName("color-hsl");
+            inputsHSL[0].value = this.toolColorHSL.h;
+            inputsHSL[1].value = this.toolColorHSL.s;
+            inputsHSL[2].value = this.toolColorHSL.l;
+
+            console.log(this.toolColorHex);
+            console.log(this.toolColorRGB);
+            console.log(this.toolColorHSL);
         },
         hexToRGB: function (hex) {
             // On retire le hash et on converti le code hexa en base16
@@ -125,6 +137,52 @@
             RGB.g = hex >> 8 & 0xFF;
             RGB.b = hex & 0xFF;
             return RGB;
+        },
+        rgbToHSL: function (rgb) {
+            var rgb2 = {};
+            var hsl = {};
+            var difference;
+
+            rgb2.r = this.toPercent(parseInt(rgb.r, 10) % 256, 256);
+            rgb2.g = this.toPercent(parseInt(rgb.g, 10) % 256, 256);
+            rgb2.b = this.toPercent(parseInt(rgb.b, 10) % 256, 256);
+
+            var max = Math.max(rgb2.r, rgb2.g, rgb2.b);
+            var min = Math.min(rgb2.r, rgb2.g, rgb2.b);
+
+            hsl.l = (max + min) / 2;
+            if (max === min) {
+                hsl.h = 0;
+                hsl.s = 0;
+            } else {
+                difference = max - min;
+                hsl.s = hsl.l > 0.5
+                    ? difference / (2 - max - min)
+                    : difference / (max + min);
+
+                switch (max) {
+                case rgb2.r:
+                    hsl.h = (rgb2.g - rgb2.b) / difference + (rgb2.g < rgb2.b
+                        ? 6
+                        : 0);
+                    break;
+                case rgb2.g:
+                    hsl.h = (rgb2.b - rgb2.r) / difference + 2;
+                    break;
+                case rgb2.b:
+                    hsl.h = (rgb2.r - rgb2.g) / difference + 4;
+                    break;
+                }
+                hsl.h /= 6;
+            }
+            hsl.h = parseInt((hsl.h * 360).toFixed(0), 10);
+            hsl.s = parseInt((hsl.s * 100).toFixed(0), 10);
+            hsl.l = parseInt((hsl.l * 100).toFixed(0), 10);
+
+            return hsl;
+        },
+        toPercent: function (amount, limit) {
+            return amount / limit;
         }
     };
 
