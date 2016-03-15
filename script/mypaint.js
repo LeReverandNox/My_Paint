@@ -15,6 +15,7 @@
         },
         inputWidth: null,
         inputHeight: null,
+        toolThickness: 5,
 
         init: function () {
             this.canvas = document.querySelector("#canvas1");
@@ -45,6 +46,7 @@
             document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
             document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
             document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.resetSizeCanvas.bind(this));
+            document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -71,6 +73,18 @@
         resetCanvas: function () {
             // On clear le canvas
             this.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+        },
+        setToolSize: function () {
+            // On récupère la value de l'input tool-thickness
+            var inputThickness = document.querySelector("#tool-thickness");
+            var thickness = isNaN(parseInt(inputThickness.value, 10))
+                ? 5
+                : inputThickness.value;
+
+            // On reaffiche la valeur au cas ou le gars a entré de la merde dans l'input
+            inputThickness.value = thickness;
+            // Et on modifie toolThickness en conséquence
+            this.toolThickness = thickness;
         }
     };
 
