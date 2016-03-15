@@ -13,10 +13,18 @@
             width: 640,
             height: 480
         },
+        inputWidth: null,
+        inputHeight: null,
 
         init: function () {
             this.canvas = document.querySelector("#canvas1");
             this.context = this.canvas.getContext("2d");
+
+            this.inputWidth = document.querySelector("#canvas-width");
+            this.inputHeight = document.querySelector("#canvas-height");
+
+            // On démarrer les listeners
+            this.addListeners();
 
             this.setDimensions();
         },
@@ -29,7 +37,23 @@
             this.canvas.style.width = this.canvasSize.width + "px";
             this.canvas.style.height = this.canvasSize.height + "px";
 
-            console.log(this.context);
+            // console.log(this.context);
+        },
+        addListeners: function () {
+            document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
+        },
+        resizeCanvas: function () {
+            var width = isNaN(parseInt(this.inputWidth.value, 10))
+                ? 640
+                : this.inputHeight.value;
+            var height = isNaN(parseInt(this.inputHeight.value, 10))
+             ? 480
+             : this.inputHeight.value;
+
+            this.canvasSize.width = width;
+            this.canvasSize.height = height;
+
+            this.setDimensions();
         }
     };
 
