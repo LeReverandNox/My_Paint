@@ -43,6 +43,7 @@
         },
         addListeners: function () {
             document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
+            document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -59,6 +60,11 @@
 
             // On redimmensionne le canvas
             this.setDimensions();
+        },
+
+        resetCanvas: function () {
+            // On clear le canvas
+            this.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
         }
     };
 
