@@ -37,22 +37,27 @@
             this.canvas.style.width = this.canvasSize.width + "px";
             this.canvas.style.height = this.canvasSize.height + "px";
 
-            // console.log(this.context);
+            // On assigne ces dimensions aux values des inputs
+            this.inputWidth.value = this.canvasSize.width;
+            this.inputHeight.value = this.canvasSize.height;
         },
         addListeners: function () {
             document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
         },
         resizeCanvas: function () {
+            // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
             var width = isNaN(parseInt(this.inputWidth.value, 10))
                 ? 640
                 : this.inputHeight.value;
             var height = isNaN(parseInt(this.inputHeight.value, 10))
-             ? 480
-             : this.inputHeight.value;
+                ? 480
+                : this.inputHeight.value;
 
+             // On assigne ces valeurs dans canvasSize
             this.canvasSize.width = width;
             this.canvasSize.height = height;
 
+            // On redimmensionne le canvas
             this.setDimensions();
         }
     };
