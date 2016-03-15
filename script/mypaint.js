@@ -16,9 +16,17 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColorHex: "#ff0000",
-        toolColorRGB: null,
-        toolColorHSL: null,
+        toolColorHex: "#ff00ab",
+        toolColorRGB: {
+            r: null,
+            g: null,
+            b: null
+        },
+        toolColorHSL: {
+            h: null,
+            s: null,
+            l: null
+        },
 
         init: function () {
             this.canvas = document.querySelector("#canvas1");
@@ -93,8 +101,6 @@
             this.toolThickness = thickness;
         },
         initColors: function () {
-            var i;
-
             // On set la value de l'input Hexa
             var inputHexa = document.querySelector("#color-hexa");
             inputHexa.value = this.toolColorHex;
@@ -104,21 +110,21 @@
 
             // On récupère les inputs RGB et on leur asigne les valeurs RGB
             var inputsRGB = document.getElementsByClassName("color-rgb");
-            i = 0;
-            this.toolColorRGB.forEach(function (value) {
-                inputsRGB[i].value = value;
-                i += 1;
-            });
+            inputsRGB[0].value = this.toolColorRGB.r;
+            inputsRGB[1].value = this.toolColorRGB.g;
+            inputsRGB[2].value = this.toolColorRGB.b;
+
         },
         hexToRGB: function (hex) {
             // On retire le hash et on converti le code hexa en base16
             hex = parseInt(hex.substr(1, hex.length - 1), 16);
 
+            var RGB = {};
             // On genere les 3 composantes grace aux opéraions bit à bit
-            var r = hex >> 16;
-            var g = hex >> 8 & 0xFF;
-            var b = hex & 0xFF;
-            return [r, g, b];
+            RGB.r = hex >> 16;
+            RGB.g = hex >> 8 & 0xFF;
+            RGB.b = hex & 0xFF;
+            return RGB;
         }
     };
 
