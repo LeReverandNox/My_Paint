@@ -16,6 +16,7 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
+        toolColor: "#000000",
 
         init: function () {
             this.canvas = document.querySelector("#canvas1");
