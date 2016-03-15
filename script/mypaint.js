@@ -16,7 +16,7 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColorHex: "#8A2727",
+        toolColorHex: "#8b2727",
         toolColorRGB: {
             r: null,
             g: null,
@@ -122,10 +122,6 @@
             inputsHSL[0].value = this.toolColorHSL.h;
             inputsHSL[1].value = this.toolColorHSL.s;
             inputsHSL[2].value = this.toolColorHSL.l;
-
-            // console.log(this.toolColorHex);
-            // console.log(this.toolColorRGB);
-            // console.log(this.toolColorHSL);
         },
         hexToRGB: function (hex) {
             // On retire le hash et on converti le code hexa en base16
@@ -185,6 +181,58 @@
             hsl.l = parseInt((hsl.l * 100).toFixed(0), 10);
 
             return hsl;
+        },
+        hslToRGB: function (hsl) {
+            var rgb = {};
+            var h = hsl.h;
+            var s = hsl.s;
+            var l = hsl.l;
+            var m, c, x;
+
+            h /= 60;
+            if (h < 0) {
+                h = 6 - (-h % 6);
+            }
+            h %= 6;
+
+            s = Math.max(0, Math.min(1, s / 100));
+            l = Math.max(0, Math.min(1, l / 100));
+
+            c = (1 - Math.abs((2 * l) - 1)) * s;
+            x = c * (1 - Math.abs((h % 2) - 1));
+
+            if (h < 1) {
+                rgb.r = c;
+                rgb.g = x;
+                rgb.b = 0;
+            } else if (h < 2) {
+                rgb.r = x;
+                rgb.g = c;
+                rgb.b = 0;
+            } else if (h < 3) {
+                rgb.r = 0;
+                rgb.g = c;
+                rgb.b = x;
+            } else if (h < 4) {
+                rgb.r = 0;
+                rgb.g = x;
+                rgb.b = c;
+            } else if (h < 5) {
+                rgb.r = x;
+                rgb.g = 0;
+                rgb.b = c;
+            } else {
+                rgb.r = c;
+                rgb.g = 0;
+                rgb.b = x;
+            }
+
+            m = l - c / 2;
+            rgb.r = Math.round((rgb.r + m) * 255);
+            rgb.g = Math.round((rgb.g + m) * 255);
+            rgb.b = Math.round((rgb.b + m) * 255);
+
+            return rgb;
         },
         toPercent: function (amount, limit) {
             return amount / limit;
