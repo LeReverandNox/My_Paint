@@ -48,7 +48,7 @@
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
             var width = isNaN(parseInt(this.inputWidth.value, 10))
                 ? 640
-                : this.inputHeight.value;
+                : this.inputWidth.value;
             var height = isNaN(parseInt(this.inputHeight.value, 10))
                 ? 480
                 : this.inputHeight.value;
