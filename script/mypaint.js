@@ -16,7 +16,9 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColor: "#000000",
+        toolColorHex: "#ff0000",
+        toolColorRGB: null,
+        toolColorHSL: null,
 
         init: function () {
             this.canvas = document.querySelector("#canvas1");
@@ -28,7 +30,10 @@
             // On démarrer les listeners
             this.addListeners();
 
+            this.initColors();
+
             this.setDimensions();
+
         },
         setDimensions: function () {
             // On définit la taille interne du canvas
@@ -86,6 +91,34 @@
             inputThickness.value = thickness;
             // Et on modifie toolThickness en conséquence
             this.toolThickness = thickness;
+        },
+        initColors: function () {
+            var i;
+
+            // On set la value de l'input Hexa
+            var inputHexa = document.querySelector("#color-hexa");
+            inputHexa.value = this.toolColorHex;
+
+            // On converti l'hexa en RGB
+            this.toolColorRGB = this.hexToRGB(this.toolColorHex);
+
+            // On récupère les inputs RGB et on leur asigne les valeurs RGB
+            var inputsRGB = document.getElementsByClassName("color-rgb");
+            i = 0;
+            this.toolColorRGB.forEach(function (value) {
+                inputsRGB[i].value = value;
+                i += 1;
+            });
+        },
+        hexToRGB: function (hex) {
+            // On retire le hash et on converti le code hexa en base16
+            hex = parseInt(hex.substr(1, hex.length - 1), 16);
+
+            // On genere les 3 composantes grace aux opéraions bit à bit
+            var r = hex >> 16;
+            var g = hex >> 8 & 0xFF;
+            var b = hex & 0xFF;
+            return [r, g, b];
         }
     };
 
