@@ -69,10 +69,10 @@
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
             var width = (isNaN(parseInt(this.inputWidth.value, 10)) || this.inputWidth.value < 1)
-                ? 640
+                ? this.canvasSize.width
                 : this.inputWidth.value;
             var height = (isNaN(parseInt(this.inputHeight.value, 10)) || this.inputHeight.value < 1)
-                ? 480
+                ? this.canvasSize.height
                 : this.inputHeight.value;
 
              // On assigne ces valeurs dans canvasSize
@@ -96,7 +96,7 @@
             // On récupère la value de l'input tool-thickness
             var inputThickness = document.querySelector("#tool-thickness");
             var thickness = (isNaN(parseInt(inputThickness.value, 10)) || inputThickness.value < 1)
-                ? 5
+                ? this.toolThickness
                 : inputThickness.value;
 
             // On reaffiche la valeur au cas ou le gars a entré de la merde dans l'input
