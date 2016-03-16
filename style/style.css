@@ -70,12 +70,15 @@ h1 {
 .body-wrapper {
     margin-bottom: 25px;
 }
-#canvas1 {
-    display: block;
+.canvas-holder {
     margin: 0 auto;
     border: 1px solid black;
     border-radius: 5px;
     cursor: crosshair;
+    position: relative;
+}
+#canvas-base, .canvas-layer{
+    position: absolute;
 }
 
 

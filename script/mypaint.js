@@ -27,9 +27,11 @@
             s: null,
             l: null
         },
+        layers: [],
+        currentLayer: 0,
 
         init: function () {
-            this.canvas = document.querySelector("#canvas1");
+            this.canvas = document.querySelector("#canvas-base");
             this.context = this.canvas.getContext("2d");
 
             this.inputWidth = document.querySelector("#canvas-width");
@@ -44,6 +46,11 @@
 
         },
         setDimensions: function () {
+            // On définit la taille du holder
+            var holder = document.querySelector(".canvas-holder");
+            holder.style.width = this.canvasSize.width + "px";
+            holder.style.height = this.canvasSize.height + "px";
+
             // On définit la taille interne du canvas
             this.context.width = this.canvasSize.width;
             this.context.height = this.canvasSize.height;
@@ -65,6 +72,8 @@
             document.querySelector("#color-hexa").addEventListener("input", this.updateFromHex.bind(this));
             document.querySelector("#tool-color-rgb").addEventListener("input", this.updateFromRGB.bind(this));
             document.querySelector("#tool-color-hsl").addEventListener("input", this.updateFromHSL.bind(this));
+
+            document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -103,6 +112,48 @@
             inputThickness.value = thickness;
             // Et on modifie toolThickness en conséquence
             this.toolThickness = thickness;
+        },
+        addLayer: function () {
+            this.currentLayer += 1;
+
+            var $holder = $(".canvas-holder");
+            var layer = {};
+
+            var $canva = $("<canvas></canvas>");
+            $canva.addClass("canvas-layer");
+            $canva.attr("id", "layer-" + this.currentLayer);
+            $canva.css({
+                width: this.canvasSize.width,
+                height: this.canvasSize.height
+            });
+            $canva.appendTo($holder);
+
+            var canva = document.querySelector("#layer-" + this.currentLayer);
+            var context = canva.getContext("2d");
+
+            context.width = this.canvasSize.width;
+            context.height = this.canvasSize.height;
+
+            layer.canva = canva;
+            layer.context = context;
+
+            this.layers[this.currentLayer] = layer;
+
+            this.updateLayersList();
+        },
+        updateLayersList: function () {
+            var $layersListHolder = $(".layers-list-holder");
+            var $layersList = $("<ul class='layer-list'></ul>");
+            var $layer;
+
+            $layersListHolder.empty();
+
+            this.layers.forEach(function (element, index) {
+                $layer = $("<li>Calque " + index + " <input type='checkbox' checked></li>");
+                $layer.appendTo($layersList);
+            });
+
+            $layersList.appendTo($layersListHolder);
         },
         initColors: function () {
             // On set la value de l'input Hexa
