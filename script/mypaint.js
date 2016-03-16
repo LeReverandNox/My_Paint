@@ -61,6 +61,10 @@
             document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
             document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.resetSizeCanvas.bind(this));
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
+
+            document.querySelector("#color-hexa").addEventListener("input", this.updateFromHex.bind(this));
+            document.querySelector("#tool-color-rgb").addEventListener("input", this.updateFromRGB.bind(this));
+            document.querySelector("#tool-color-hsl").addEventListener("input", this.updateFromHSL.bind(this));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -122,6 +126,54 @@
             inputsHSL[0].value = this.toolColorHSL.h;
             inputsHSL[1].value = this.toolColorHSL.s;
             inputsHSL[2].value = this.toolColorHSL.l;
+        },
+        updateFromHex: function () {
+            var inputHexa = document.querySelector("#color-hexa");
+            this.toolColorHex = inputHexa.value;
+            this.initColors();
+        },
+        updateFromRGB: function () {
+            // On garde une référence vers this, car on la perd dans le each sinon
+            var self = this;
+            var val, tmp;
+
+            // Petit each jQuery, la facilité !
+            $.each(this.toolColorRGB, function (index, value) {
+                tmp = document.querySelector("#color-" + index).value;
+                val = (tmp > 255 || tmp < 0)
+                    ? value
+                    : tmp;
+
+                self.toolColorRGB[index] = val;
+            });
+
+            this.toolColorHex = this.rgbToHex(this.toolColorRGB);
+            this.initColors();
+        },
+        updateFromHSL: function () {
+            // On garde une référence vers this, car on la perd dans le each sinon
+            var self = this;
+            var val, tmp;
+
+            // Petit each jQuery, la facilité !
+            $.each(this.toolColorHSL, function (index, value) {
+                tmp = document.querySelector("#color-" + index).value;
+                if (index === "h") {
+                    val = (tmp > 359 || tmp < 0)
+                        ? value
+                        : tmp;
+                } else {
+                    val = (tmp > 100 || tmp < 0)
+                        ? value
+                        : tmp;
+                }
+
+                self.toolColorHSL[index] = val;
+            });
+
+            this.toolColorRGB = this.hslToRGB(this.toolColorHSL);
+            this.toolColorHex = this.rgbToHex(this.toolColorRGB);
+            this.initColors();
         },
         hexToRGB: function (hex) {
             // On retire le hash et on converti le code hexa en base16
