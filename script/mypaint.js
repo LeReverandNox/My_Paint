@@ -16,7 +16,7 @@
         inputWidth: null,
         inputHeight: null,
         toolThickness: 5,
-        toolColorHex: "#8b2727",
+        toolColorHex: "#00ff2c",
         toolColorRGB: {
             r: null,
             g: null,
@@ -114,46 +114,97 @@
             this.toolThickness = thickness;
         },
         addLayer: function () {
-            this.currentLayer += 1;
+            var nextLayer = this.layers.length;
+            if (this.layers.length === 0) {
+                nextLayer += 1;
+            }
 
             var $holder = $(".canvas-holder");
             var layer = {};
 
             var $canva = $("<canvas></canvas>");
             $canva.addClass("canvas-layer");
-            $canva.attr("id", "layer-" + this.currentLayer);
+            $canva.attr("id", "layer-" + nextLayer);
             $canva.css({
                 width: this.canvasSize.width,
                 height: this.canvasSize.height
             });
             $canva.appendTo($holder);
 
-            var canva = document.querySelector("#layer-" + this.currentLayer);
+            var canva = document.querySelector("#layer-" + nextLayer);
             var context = canva.getContext("2d");
 
             context.width = this.canvasSize.width;
             context.height = this.canvasSize.height;
 
+            context.beginPath();
+            context.moveTo(nextLayer * 5, 5);
+            context.lineTo(nextLayer * 5, 50);
+            context.strokeStyle = this.toolColorHex;
+            context.lineWidth = this.toolThickness;
+            context.stroke();
+
             layer.canva = canva;
             layer.context = context;
+            layer.hidden = false;
 
-            this.layers[this.currentLayer] = layer;
+            this.layers[nextLayer] = layer;
+
+            this.updateCurrentLayer();
 
             this.updateLayersList();
         },
         updateLayersList: function () {
+            var self = this;
             var $layersListHolder = $(".layers-list-holder");
             var $layersList = $("<ul class='layer-list'></ul>");
             var $layer;
-
+            var $checkbox;
             $layersListHolder.empty();
 
             this.layers.forEach(function (element, index) {
-                $layer = $("<li>Calque " + index + " <input type='checkbox' checked></li>");
+                $layer = $("<li class='layer-li'>Calque " + index + "</li>");
+                $checkbox = element.hidden === false
+                    ? $("<input type='checkbox' attr-num='" + index + "' checked>")
+                    : $("<input type='checkbox' attr-num='" + index + "'>");
+                $checkbox.appendTo($layer);
+
+                $layer.find("input").on("change", function (event) {
+                    var num = (event.target.getAttribute("attr-num"));
+                    self.toggleLayer(num);
+                });
+
                 $layer.appendTo($layersList);
             });
 
             $layersList.appendTo($layersListHolder);
+        },
+        toggleLayer: function (num) {
+            var $layer = $("#layer-" + num);
+
+            if (false === $layer.hasClass("hidden")) {
+                $layer.addClass("hidden");
+                this.layers[num].hidden = true;
+            } else {
+                $layer.removeClass("hidden");
+                this.layers[num].hidden = false;
+            }
+
+            this.updateCurrentLayer();
+        },
+        updateCurrentLayer: function () {
+            var i = this.layers.length - 1;
+            var again = true;
+
+            while (true === again) {
+                if (undefined === this.layers[i] || this.layers[i].hidden === false) {
+                    this.currentLayer  = i;
+                    again = false;
+                }
+                i -= 1;
+            }
+
+            console.log(this.currentLayer);
         },
         initColors: function () {
             // On set la value de l'input Hexa

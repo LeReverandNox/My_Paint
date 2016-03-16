@@ -80,7 +80,9 @@ h1 {
 #canvas-base, .canvas-layer{
     position: absolute;
 }
-
+.hidden {
+    display: none;
+}
 
 /* footer */
 
