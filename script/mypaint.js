@@ -160,6 +160,7 @@
             var $layersList = $("<ul class='layer-list'></ul>");
             var $layer;
             var $checkbox;
+            // var $delete;
             $layersListHolder.empty();
 
             this.layers.forEach(function (element, index) {
@@ -169,10 +170,18 @@
                     : $("<input type='checkbox' attr-num='" + index + "'>");
                 $checkbox.appendTo($layer);
 
+                // $delete = $("<button attr-num='" + index + "'>Supprimer</button>");
+                // $delete.appendTo($layer);
+
                 $layer.find("input").on("change", function (event) {
                     var num = (event.target.getAttribute("attr-num"));
                     self.toggleLayer(num);
                 });
+
+                // $layer.find("button").on("click", function (event) {
+                //     var num = (event.target.getAttribute("attr-num"));
+                //     self.deleteLayer(num);
+                // });
 
                 $layer.appendTo($layersList);
             });
@@ -198,14 +207,18 @@
 
             while (true === again) {
                 if (undefined === this.layers[i] || this.layers[i].hidden === false) {
-                    this.currentLayer  = i;
+                    this.currentLayer = i;
                     again = false;
                 }
                 i -= 1;
             }
-
-            console.log(this.currentLayer);
         },
+        // deleteLayer: function (num) {
+        //     // this.layers.splice(num, 1);
+        //     var $layer = $("#layer-" + num);
+
+        //     console.log(this.layers);
+        // },
         initColors: function () {
             // On set la value de l'input Hexa
             var inputHexa = document.querySelector("#color-hexa");

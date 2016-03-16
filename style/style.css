@@ -81,7 +81,8 @@ h1 {
     position: absolute;
 }
 .hidden {
-    display: none;
+    /*display: none;*/
+    opacity: 0;
 }
 
 /* footer */
