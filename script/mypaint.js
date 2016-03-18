@@ -28,11 +28,13 @@
             l: null
         },
         layers: [],
-        currentLayer: 0,
+        currentLayer: null,
 
         init: function () {
             this.canvas = document.querySelector("#canvas-base");
             this.context = this.canvas.getContext("2d");
+
+            this.currentLayer = this.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
             this.inputHeight = document.querySelector("#canvas-height");
@@ -187,7 +189,7 @@
                 $down = $("<button class='layer-down' attr-num='" + layer.id + "'>Down</button>");
                 $down.appendTo($layer);
 
-                $active = layer.active === false
+                $active = layer.active === true
                     ? $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "' checked>")
                     : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
                 $active.appendTo($layer);
@@ -196,6 +198,9 @@
             });
 
             $layersList.appendTo($layersListHolder);
+
+            console.log(this.currentLayer);
+
         },
         toggleLayer: function (layer, $layer, num) {
             console.log("On va hide le calque " + num);
@@ -225,6 +230,8 @@
             this.layers.splice(index, 1);
 
             $layer.remove();
+
+            this.verifyCurrentLayer(layer);
         },
         deleteAllLayers: function () {
             var i;
@@ -269,12 +276,37 @@
                 this.moveLayerDown(layer, $layer, num);
                 break;
             case "layer-active":
-                this.activateLayer(layer, $layer, num);
+                this.activateLayer(layer, num);
                 break;
             }
 
             this.recalculateOrder();
             this.updateLayersList();
+        },
+        activateLayer: function (layer, num) {
+            this.layers.forEach(function (otherLayer) {
+                otherLayer.active = false;
+            });
+            layer.active = true;
+
+            this.currentLayer = layer.context;
+        },
+        verifyCurrentLayer: function (layer) {
+            var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
+            layersForDisplay.sort(this.comparator);
+            var lastLayer  = layersForDisplay.length >= 1
+                ? layersForDisplay[layersForDisplay.length - 1]
+                : null;
+
+            if (layer.active === true) {
+                if (lastLayer === null) {
+                    this.currentLayer = this.context;
+                } else {
+                    var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
+                    layerToActivate.active = true;
+                    this.currentLayer = layerToActivate.context;
+                }
+            }
         },
         recalculateOrder: function () {
             var self = this;
