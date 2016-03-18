@@ -70,7 +70,7 @@
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
             document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
             document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
-            // document.querySelector(".layer-list").addEventListener("click", test(this, self));
+            document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -135,12 +135,12 @@
             context.width = this.canvasSize.width;
             context.height = this.canvasSize.height;
 
-            // context.beginPath();
-            // context.moveTo(nextLayer * 5, 5);
-            // context.lineTo(nextLayer * 5, 50);
-            // context.strokeStyle = this.toolColorHex;
-            // context.lineWidth = this.toolThickness;
-            // context.stroke();
+            context.beginPath();
+            context.moveTo(nextLayer * 5, 5);
+            context.lineTo(nextLayer * 5, 50);
+            context.strokeStyle = this.toolColorHex;
+            context.lineWidth = this.toolThickness;
+            context.stroke();
 
             layer.id = nextLayer;
             layer.canva = canva;
@@ -162,24 +162,15 @@
 
             this.layers.forEach(function (layer) {
                 $layer = $("<li class='layer-li'>Calque " + layer.id + "</li>");
+
                 $checkbox = layer.hidden === false
-                    ? $("<input type='checkbox' attr-num='" + layer.id + "' checked>")
+                    ? $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "' checked>")
                     : $("<input type='checkbox' attr-num='" + layer.id + "'>");
                 $checkbox.appendTo($layer);
 
-                $delete = $("<button attr-num='" + layer.id + "'>Supprimer</button>");
+                $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
                 $delete.appendTo($layer);
-
-                $layer.find("input").on("change", function (event) {
-                    var num = (event.target.getAttribute("attr-num"));
-                    self.toggleLayer(num);
-                });
-
-                $layer.find("button").on("click", function (event) {
-                    var num = (event.target.getAttribute("attr-num"));
-                    self.deleteLayer(num);
-                });
-
+]
                 $layer.appendTo($layersList);
             });
 
@@ -242,6 +233,26 @@
             }
 
             return id;
+        },
+        manipulateLayers: function (e) {
+            var num = e.target.getAttribute("attr-num");
+            switch (e.target.className) {
+            case "layer-hide":
+                this.toggleLayer(num);
+                break;
+            case  "layer-delete":
+                this.deleteLayer(num);
+                break;
+            case "layer-up":
+                this.moveLayerUp(num);
+                break;
+            case "layer-down":
+                this.moveLayerDown(num);
+                break;
+            case "layer-active":
+                this.activateLayer(num);
+                break;
+            }
         },
         initColors: function () {
             // On set la value de l'input Hexa
