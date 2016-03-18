@@ -88,6 +88,9 @@
             this.canvasSize.width = width;
             this.canvasSize.height = height;
 
+            // On reset les canvas, les layers etc
+            this.resetCanvas();
+
             // On redimmensionne le canvas
             this.setDimensions();
         },
@@ -100,6 +103,7 @@
         resetCanvas: function () {
             // On clear le canvas
             this.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+            this.deleteAllLayers();
         },
         setToolSize: function () {
             // On récupère la value de l'input tool-thickness
@@ -114,10 +118,7 @@
             this.toolThickness = thickness;
         },
         addLayer: function () {
-            var nextLayer = this.layers.length;
-            if (this.layers.length === 0) {
-                nextLayer += 1;
-            }
+            var nextLayer = this.getLastLayerId() + 1;
 
             var $holder = $(".canvas-holder");
             var layer = {};
@@ -144,13 +145,13 @@
             context.lineWidth = this.toolThickness;
             context.stroke();
 
+            layer.id = nextLayer;
             layer.canva = canva;
             layer.context = context;
             layer.hidden = false;
 
-            this.layers[nextLayer] = layer;
-
-            this.updateCurrentLayer();
+            // this.layers[nextLayer] = layer;
+            this.layers.push(layer);
 
             this.updateLayersList();
         },
@@ -160,28 +161,28 @@
             var $layersList = $("<ul class='layer-list'></ul>");
             var $layer;
             var $checkbox;
-            // var $delete;
+            var $delete;
             $layersListHolder.empty();
 
-            this.layers.forEach(function (element, index) {
-                $layer = $("<li class='layer-li'>Calque " + index + "</li>");
-                $checkbox = element.hidden === false
-                    ? $("<input type='checkbox' attr-num='" + index + "' checked>")
-                    : $("<input type='checkbox' attr-num='" + index + "'>");
+            this.layers.forEach(function (layer) {
+                $layer = $("<li class='layer-li'>Calque " + layer.id + "</li>");
+                $checkbox = layer.hidden === false
+                    ? $("<input type='checkbox' attr-num='" + layer.id + "' checked>")
+                    : $("<input type='checkbox' attr-num='" + layer.id + "'>");
                 $checkbox.appendTo($layer);
 
-                // $delete = $("<button attr-num='" + index + "'>Supprimer</button>");
-                // $delete.appendTo($layer);
+                $delete = $("<button attr-num='" + layer.id + "'>Supprimer</button>");
+                $delete.appendTo($layer);
 
                 $layer.find("input").on("change", function (event) {
                     var num = (event.target.getAttribute("attr-num"));
                     self.toggleLayer(num);
                 });
 
-                // $layer.find("button").on("click", function (event) {
-                //     var num = (event.target.getAttribute("attr-num"));
-                //     self.deleteLayer(num);
-                // });
+                $layer.find("button").on("click", function (event) {
+                    var num = (event.target.getAttribute("attr-num"));
+                    self.deleteLayer(num);
+                });
 
                 $layer.appendTo($layersList);
             });
@@ -190,19 +191,20 @@
         },
         toggleLayer: function (num) {
             var $layer = $("#layer-" + num);
+            var layer = $.grep(this.layers, function (e) {
+                return e.id === parseInt(num);
+            });
 
             if (false === $layer.hasClass("hidden")) {
                 $layer.addClass("hidden");
-                this.layers[num].hidden = true;
+                layer[0].hidden = true;
             } else {
                 $layer.removeClass("hidden");
-                this.layers[num].hidden = false;
+                layer[0].hidden = false;
             }
-
-            this.updateCurrentLayer();
         },
         updateCurrentLayer: function () {
-            var i = this.layers.length - 1;
+            var i = this.layers.length;
             var again = true;
 
             while (true === again) {
@@ -213,12 +215,38 @@
                 i -= 1;
             }
         },
-        // deleteLayer: function (num) {
-        //     // this.layers.splice(num, 1);
-        //     var $layer = $("#layer-" + num);
+        deleteLayer: function (num) {
+            var layer = $.grep(this.layers, function (e) {
+                return e.id === parseInt(num);
+            });
 
-        //     console.log(this.layers);
-        // },
+            var index = this.layers.indexOf(layer[0]);
+            this.layers.splice(index, 1);
+
+            var $layer = $("#layer-" + num);
+            $layer.remove();
+
+            this.updateLayersList();
+        },
+        deleteAllLayers: function () {
+            var self = this;
+            var i;
+
+            for (i = this.layers.length - 1; i >= 0; i -= 1) {
+                this.deleteLayer(this.layers[i].id);
+            }
+        },
+        getLastLayerId: function () {
+            var i = this.layers.length - 1;
+            var id;
+            if (undefined !== this.layers[i]) {
+                id = this.layers[i].id;
+            } else {
+                id = 0;
+            }
+
+            return id;
+        },
         initColors: function () {
             // On set la value de l'input Hexa
             var inputHexa = document.querySelector("#color-hexa");
