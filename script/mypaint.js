@@ -68,12 +68,9 @@
             document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
             document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.resetSizeCanvas.bind(this));
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
-
-            document.querySelector("#color-hexa").addEventListener("input", this.updateFromHex.bind(this));
-            document.querySelector("#tool-color-rgb").addEventListener("input", this.updateFromRGB.bind(this));
-            document.querySelector("#tool-color-hsl").addEventListener("input", this.updateFromHSL.bind(this));
-
+            document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
             document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
+            // document.querySelector(".layer-list").addEventListener("click", test(this, self));
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -138,19 +135,18 @@
             context.width = this.canvasSize.width;
             context.height = this.canvasSize.height;
 
-            context.beginPath();
-            context.moveTo(nextLayer * 5, 5);
-            context.lineTo(nextLayer * 5, 50);
-            context.strokeStyle = this.toolColorHex;
-            context.lineWidth = this.toolThickness;
-            context.stroke();
+            // context.beginPath();
+            // context.moveTo(nextLayer * 5, 5);
+            // context.lineTo(nextLayer * 5, 50);
+            // context.strokeStyle = this.toolColorHex;
+            // context.lineWidth = this.toolThickness;
+            // context.stroke();
 
             layer.id = nextLayer;
             layer.canva = canva;
             layer.context = context;
             layer.hidden = false;
 
-            // this.layers[nextLayer] = layer;
             this.layers.push(layer);
 
             this.updateLayersList();
@@ -249,7 +245,7 @@
         },
         initColors: function () {
             // On set la value de l'input Hexa
-            var inputHexa = document.querySelector("#color-hexa");
+            var inputHexa = document.querySelector(".color-hexa");
             inputHexa.value = this.toolColorHex;
 
             // On converti l'hexa en RGB
@@ -270,8 +266,21 @@
             inputsHSL[1].value = this.toolColorHSL.s;
             inputsHSL[2].value = this.toolColorHSL.l;
         },
+        updateColor: function (e) {
+            switch (e.target.className) {
+            case "color-hexa":
+                this.updateFromHex();
+                break;
+            case "color-rgb":
+                this.updateFromRGB();
+                break;
+            case "color-hsl":
+                this.updateFromHSL();
+                break;
+            }
+        },
         updateFromHex: function () {
-            var inputHexa = document.querySelector("#color-hexa");
+            var inputHexa = document.querySelector(".color-hexa");
             this.toolColorHex = inputHexa.value;
             this.initColors();
         },
