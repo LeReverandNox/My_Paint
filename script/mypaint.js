@@ -125,7 +125,8 @@
             $canva.attr("id", "layer-" + nextLayer);
             $canva.css({
                 width: this.canvasSize.width,
-                height: this.canvasSize.height
+                height: this.canvasSize.height,
+                "z-index": nextLayer
             });
             $canva.appendTo($holder);
 
@@ -146,6 +147,8 @@
             layer.canva = canva;
             layer.context = context;
             layer.hidden = false;
+            layer.active = false;
+            layer.order = nextLayer;
 
             this.layers.push(layer);
 
@@ -155,38 +158,50 @@
             var $layersListHolder = $(".layers-list-holder");
             var $layersList = $("<ul class='layer-list'></ul>");
             var $layer;
-            var $checkbox;
+            var $hidden;
             var $delete;
+            var $up;
+            var $down;
+            var $active;
+
             $layersListHolder.empty();
 
             this.layers.forEach(function (layer) {
                 $layer = $("<li class='layer-li'>Calque " + layer.id + "</li>");
 
-                $checkbox = layer.hidden === false
+                $hidden = layer.hidden === false
                     ? $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "' checked>")
                     : $("<input type='checkbox' attr-num='" + layer.id + "'>");
-                $checkbox.appendTo($layer);
+                $hidden.appendTo($layer);
 
                 $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
                 $delete.appendTo($layer);
+
+                $up = $("<button class='layer-up' attr-num='" + layer.id + "'>Up</button>");
+                $up.appendTo($layer);
+
+                $down = $("<button class='layer-down' attr-num='" + layer.id + "'>Down</button>");
+                $down.appendTo($layer);
+
+                $active = layer.active === false
+                    ? $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "' checked>")
+                    : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
+                $active.appendTo($layer);
+
 
                 $layer.appendTo($layersList);
             });
 
             $layersList.appendTo($layersListHolder);
         },
-        toggleLayer: function (num) {
-            var $layer = $("#layer-" + num);
-            var layer = $.grep(this.layers, function (e) {
-                return e.id === parseInt(num);
-            });
+        toggleLayer: function (layer, $layer, num) {
 
             if (false === $layer.hasClass("hidden")) {
                 $layer.addClass("hidden");
-                layer[0].hidden = true;
+                layer.hidden = true;
             } else {
                 $layer.removeClass("hidden");
-                layer[0].hidden = false;
+                layer.hidden = false;
             }
         },
         updateCurrentLayer: function () {
@@ -201,15 +216,10 @@
                 i -= 1;
             }
         },
-        deleteLayer: function (num) {
-            var layer = $.grep(this.layers, function (e) {
-                return e.id === parseInt(num);
-            });
-
+        deleteLayer: function (layer, $layer, num) {
             var index = this.layers.indexOf(layer[0]);
             this.layers.splice(index, 1);
 
-            var $layer = $("#layer-" + num);
             $layer.remove();
 
             this.updateLayersList();
@@ -233,24 +243,69 @@
             return id;
         },
         manipulateLayers: function (e) {
-            var num = e.target.getAttribute("attr-num");
+            var num = parseInt(e.target.getAttribute("attr-num"));
+            var layer = $.grep(this.layers, function (e) {
+                return e.id === parseInt(num);
+            });
+            layer = layer[0];
+            var $layer = $("#layer-" + num);
+
+
             switch (e.target.className) {
             case "layer-hide":
-                this.toggleLayer(num);
+                this.toggleLayer(layer, $layer, num);
                 break;
             case "layer-delete":
-                this.deleteLayer(num);
+                this.deleteLayer(layer, $layer, num);
                 break;
             case "layer-up":
-                this.moveLayerUp(num);
+                this.moveLayerUp(layer, $layer, num);
                 break;
             case "layer-down":
-                this.moveLayerDown(num);
+                this.moveLayerDown(layer, $layer, num);
                 break;
             case "layer-active":
-                this.activateLayer(num);
+                this.activateLayer(layer, $layer, num);
                 break;
             }
+        },
+        moveLayerUp: function (layer, $layer, num) {
+            if (layer.order === 1) {
+                return false;
+            };
+
+            var previousLayer = this.grepOne(this.layers, "order", layer.order - 1);
+            var $previousLayer = $(previousLayer.canva);
+
+            layer.order = layer.order - 1;
+            previousLayer.order = previousLayer.order + 1;
+
+            $layer.css({"z-index" : layer.order - 1});
+            $previousLayer.css({"z-index" : previousLayer.order + 1});
+        },
+        moveLayerDown: function (layer, $layer, num) {
+            if (layer.order === this.layers.length) {
+                return false;
+            };
+
+            var nextLayer = this.grepOne(this.layers, "order", layer.order + 1);
+            var $nextLayer = $(nextLayer.canva);
+
+            layer.order = layer.order + 1;
+            nextLayer.order = nextLayer.order - 1;
+
+            $layer.css({"z-index" : layer.order + 1});
+            $nextLayer.css({"z-index" : nextLayer.order - 1});
+        },
+        grepOne: function (where, attr, value) {
+            var res = $.grep(where, function (e) {
+                return e[attr] === parseInt(value);
+            });
+            if (res.length > 0) {
+                return res[0];
+            } else {
+                return false;
+            };
         },
         initColors: function () {
             // On set la value de l'input Hexa
