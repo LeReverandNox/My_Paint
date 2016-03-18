@@ -152,7 +152,6 @@
             this.updateLayersList();
         },
         updateLayersList: function () {
-            var self = this;
             var $layersListHolder = $(".layers-list-holder");
             var $layersList = $("<ul class='layer-list'></ul>");
             var $layer;
@@ -170,7 +169,7 @@
 
                 $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
                 $delete.appendTo($layer);
-]
+
                 $layer.appendTo($layersList);
             });
 
@@ -216,7 +215,6 @@
             this.updateLayersList();
         },
         deleteAllLayers: function () {
-            var self = this;
             var i;
 
             for (i = this.layers.length - 1; i >= 0; i -= 1) {
@@ -240,7 +238,7 @@
             case "layer-hide":
                 this.toggleLayer(num);
                 break;
-            case  "layer-delete":
+            case "layer-delete":
                 this.deleteLayer(num);
                 break;
             case "layer-up":
