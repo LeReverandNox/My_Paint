@@ -15,7 +15,7 @@
         },
         inputWidth: null,
         inputHeight: null,
-        toolThickness: 5,
+        toolThickness: 10,
         toolColorHex: "#00ff2c",
         toolColorRGB: {
             r: null,
@@ -152,6 +152,7 @@
 
             this.layers.push(layer);
 
+            this.recalculateOrder();
             this.updateLayersList();
         },
         updateLayersList: function () {
@@ -166,12 +167,15 @@
 
             $layersListHolder.empty();
 
-            this.layers.forEach(function (layer) {
+            var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
+            layersForDisplay.sort(this.comparator);
+
+            layersForDisplay.forEach(function (layer) {
                 $layer = $("<li class='layer-li'>Calque " + layer.id + "</li>");
 
                 $hidden = layer.hidden === false
                     ? $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "' checked>")
-                    : $("<input type='checkbox' attr-num='" + layer.id + "'>");
+                    : $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "'>");
                 $hidden.appendTo($layer);
 
                 $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
@@ -188,14 +192,13 @@
                     : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
                 $active.appendTo($layer);
 
-
                 $layer.appendTo($layersList);
             });
 
             $layersList.appendTo($layersListHolder);
         },
         toggleLayer: function (layer, $layer, num) {
-
+            console.log("On va hide le calque " + num);
             if (false === $layer.hasClass("hidden")) {
                 $layer.addClass("hidden");
                 layer.hidden = true;
@@ -217,19 +220,22 @@
             }
         },
         deleteLayer: function (layer, $layer, num) {
-            var index = this.layers.indexOf(layer[0]);
+            console.log("On va delete le calque " + num);
+            var index = this.layers.indexOf(layer);
             this.layers.splice(index, 1);
 
             $layer.remove();
-
-            this.updateLayersList();
         },
         deleteAllLayers: function () {
             var i;
+            var $layer;
 
             for (i = this.layers.length - 1; i >= 0; i -= 1) {
-                this.deleteLayer(this.layers[i].id);
+                $layer = $(this.layers[i].canva);
+                this.deleteLayer(this.layers[i], $layer, this.layers[i].id);
             }
+
+            this.updateLayersList();
         },
         getLastLayerId: function () {
             var i = this.layers.length - 1;
@@ -244,12 +250,10 @@
         },
         manipulateLayers: function (e) {
             var num = parseInt(e.target.getAttribute("attr-num"));
-            var layer = $.grep(this.layers, function (e) {
-                return e.id === parseInt(num);
-            });
-            layer = layer[0];
+            var layer = this.grepOne(this.layers, "id", num);
             var $layer = $("#layer-" + num);
 
+            console.log("On a cliqué sur le calque " + num);
 
             switch (e.target.className) {
             case "layer-hide":
@@ -268,11 +272,23 @@
                 this.activateLayer(layer, $layer, num);
                 break;
             }
+
+            this.recalculateOrder();
+            this.updateLayersList();
+        },
+        recalculateOrder: function () {
+            var self = this;
+            var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
+            layersForDisplay.sort(this.comparator);
+            layersForDisplay.forEach(function (layer) {
+                var layer2 = self.grepOne(self.layers, "id", layer.id);
+                layer2.order = layersForDisplay.indexOf(layer) + 1;
+            });
         },
         moveLayerUp: function (layer, $layer, num) {
             if (layer.order === 1) {
                 return false;
-            };
+            }
 
             var previousLayer = this.grepOne(this.layers, "order", layer.order - 1);
             var $previousLayer = $(previousLayer.canva);
@@ -280,13 +296,13 @@
             layer.order = layer.order - 1;
             previousLayer.order = previousLayer.order + 1;
 
-            $layer.css({"z-index" : layer.order - 1});
-            $previousLayer.css({"z-index" : previousLayer.order + 1});
+            $layer.css({"z-index": layer.order - 1});
+            $previousLayer.css({"z-index": previousLayer.order + 1});
         },
         moveLayerDown: function (layer, $layer, num) {
             if (layer.order === this.layers.length) {
                 return false;
-            };
+            }
 
             var nextLayer = this.grepOne(this.layers, "order", layer.order + 1);
             var $nextLayer = $(nextLayer.canva);
@@ -294,8 +310,8 @@
             layer.order = layer.order + 1;
             nextLayer.order = nextLayer.order - 1;
 
-            $layer.css({"z-index" : layer.order + 1});
-            $nextLayer.css({"z-index" : nextLayer.order - 1});
+            $layer.css({"z-index": layer.order + 1});
+            $nextLayer.css({"z-index": nextLayer.order - 1});
         },
         grepOne: function (where, attr, value) {
             var res = $.grep(where, function (e) {
@@ -305,7 +321,10 @@
                 return res[0];
             } else {
                 return false;
-            };
+            }
+        },
+        comparator: function (a, b) {
+            return parseInt(a.order, 10) - parseInt(b.order, 10);
         },
         initColors: function () {
             // On set la value de l'input Hexa
