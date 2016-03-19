@@ -11,6 +11,7 @@
     var Tool = {
         currentContext: null,
         toolThickness: 10,
+        toolEnd: "round",
         toolColorHex: "#00ff2c",
         toolColorRGB: {
             r: null,
@@ -40,6 +41,7 @@
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
+                this.currentContext.lineCap = this.toolEnd;
                 this.currentContext.lineTo(mouse.layerX, mouse.layerY);
                 this.currentContext.strokeStyle = this.toolColorHex;
                 this.currentContext.lineWidth = this.toolThickness;

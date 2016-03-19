@@ -7,8 +7,13 @@
     var paint = {
 
         // Le canvas et son context, qu'on va initialiser dans init()
-        canvas: null,
-        context: null,
+        background: {
+            id: "base",
+            canvas: null,
+            context: null,
+            hidden: false,
+            active: true
+        },
         canvasSize: {
             width: 640,
             height: 480
@@ -33,10 +38,10 @@
         currentToolName: "pencil",
 
         init: function () {
-            this.canvas = document.querySelector("#canvas-base");
-            this.context = this.canvas.getContext("2d");
+            this.background.canvas = document.querySelector("#canvas-base");
+            this.background.context = this.background.canvas.getContext("2d");
 
-            Tool.currentContext = this.context;
+            Tool.currentContext = this.background.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
             this.inputHeight = document.querySelector("#canvas-height");
@@ -59,16 +64,18 @@
             holder.style.height = this.canvasSize.height + "px";
 
             // On définit la taille interne du canvas
-            this.context.canvas.width = this.canvasSize.width;
-            this.context.canvas.height = this.canvasSize.height;
+            this.background.context.canvas.width = this.canvasSize.width;
+            this.background.context.canvas.height = this.canvasSize.height;
 
             // Ainsi que sa taille visuelle
-            this.canvas.style.width = this.canvasSize.width + "px";
-            this.canvas.style.height = this.canvasSize.height + "px";
+            this.background.canvas.style.width = this.canvasSize.width + "px";
+            this.background.canvas.style.height = this.canvasSize.height + "px";
 
             // On assigne ces dimensions aux values des inputs
             this.inputWidth.value = this.canvasSize.width;
             this.inputHeight.value = this.canvasSize.height;
+
+            this.updateLayersList();
         },
         addListeners: function () {
             document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
@@ -127,7 +134,8 @@
         },
         resetCanvas: function () {
             // On clear le canvas
-            this.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+            this.background.context.clearRect(0, 0, this.canvasSize.width, this.canvasSize.height);
+            this.background.hidden = false;
             this.deleteAllLayers();
         },
         setToolSize: function () {
@@ -195,6 +203,19 @@
 
             $layersListHolder.empty();
 
+            var $base = $("<p class='base'>Background</p>");
+            $hidden = this.background.hidden === false
+                ? $("<input type='checkbox' class='background-hide' attr-num='" + this.background.id + "' checked>")
+                : $("<input type='checkbox' class='background-hide' attr-num='" + this.background.id + "'>");
+            $hidden.appendTo($base);
+
+            $active = this.background.active === true
+                ? $("<input type='checkbox' class='background-active' attr-num='" + this.background.id + "' checked>")
+                : $("<input type='checkbox' class='background-active' attr-num='" + this.background.id + "'>");
+            $active.appendTo($base);
+
+            $base.appendTo($layersListHolder);
+
             var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
             layersForDisplay.sort(this.comparator);
 
@@ -206,8 +227,10 @@
                     : $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "'>");
                 $hidden.appendTo($layer);
 
-                $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
-                $delete.appendTo($layer);
+                $active = layer.active === true
+                    ? $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "' checked>")
+                    : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
+                $active.appendTo($layer);
 
                 $up = $("<button class='layer-up' attr-num='" + layer.id + "'>Up</button>");
                 $up.appendTo($layer);
@@ -215,10 +238,8 @@
                 $down = $("<button class='layer-down' attr-num='" + layer.id + "'>Down</button>");
                 $down.appendTo($layer);
 
-                $active = layer.active === true
-                    ? $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "' checked>")
-                    : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
-                $active.appendTo($layer);
+                $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
+                $delete.appendTo($layer);
 
                 $layer.appendTo($layersList);
             });
@@ -232,6 +253,16 @@
             } else {
                 $layer.removeClass("hidden");
                 layer.hidden = false;
+            }
+        },
+        toggleBackground: function () {
+            var $bg = $("#canvas-base");
+            if (false === $bg.hasClass("hidden")) {
+                $bg.addClass("hidden");
+                this.background.hidden = true;
+            } else {
+                $bg.removeClass("hidden");
+                this.background.hidden = false;
             }
         },
         updateCurrentLayer: function () {
@@ -297,15 +328,31 @@
             case "layer-active":
                 this.activateLayer(layer);
                 break;
+            case "background-hide":
+                this.toggleBackground();
+                break;
+            case "background-active":
+                this.activateBackground();
+                break;
             }
 
             this.recalculateOrder();
             this.updateLayersList();
         },
+        activateBackground: function () {
+            this.layers.forEach(function (otherLayer) {
+                otherLayer.active = false;
+            });
+            this.background.active = true;
+
+            Tool.currentContext = this.background.context;
+        },
         activateLayer: function (layer) {
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
             });
+            this.background.active = false;
+
             layer.active = true;
 
             Tool.currentContext = layer.context;
@@ -319,7 +366,8 @@
 
             if (layer.active === true) {
                 if (lastLayer === null) {
-                    Tool.currentContext = this.context;
+                    this.background.active = true;
+                    Tool.currentContext = this.background.context;
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
                     layerToActivate.active = true;
