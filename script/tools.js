@@ -5,7 +5,8 @@
     "use strict";
 
     var tools = {
-        pencil: null
+        pencil: null,
+        eraser: null
     };
 
     var Tool = {
@@ -52,10 +53,31 @@
             this.click1 = false;
         }
     };
+    tools.eraser = {
+        handleMouseDown: function (mouse) {
+            this.click1 = true;
+            this.currentContext.beginPath();
+            this.currentContext.moveTo(mouse.layerX, mouse.layerY);
+        },
+        handleMouseMove: function (mouse) {
+            if (this.click1 === true) {
+                this.currentContext.globalCompositeOperation = "destination-out";
+                this.currentContext.lineCap = this.toolEnd;
+                this.currentContext.lineTo(mouse.layerX, mouse.layerY);
+                this.currentContext.strokeStyle = this.toolColorHex;
+                this.currentContext.lineWidth = this.toolThickness;
+                this.currentContext.stroke();
+            }
+        },
+        handleMouseUp: function (mouse) {
+            this.click1 = false;
+        }
+    };
 
     // Expose l'objet à l'exterieur du scope de la fonction.
     // Depuis l'extérieur, vous pouvez l'utilisé ainsi :
     // var monDestroyer = shipFactory.build(shipFactory.TYPE_DESTROYER)
     global.Tool = Tool;
     global.toolFactory = toolFactory;
+    global.tools = tools;
 }(this));

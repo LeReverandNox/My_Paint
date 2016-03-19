@@ -1,5 +1,5 @@
 /*jslint browser this for bitwise */
-/*global alert $ Tool pencil toolFactory */
+/*global alert $ Tool tools toolFactory */
 
 (function () {
     "use strict";
@@ -54,6 +54,8 @@
             this.setDimensions();
 
             this.setToolSize();
+
+            this.generateToolsList();
 
             this.currentTool = toolFactory.new(this.currentToolName);
         },
@@ -149,6 +151,14 @@
             inputThickness.value = thickness;
             // Et on modifie toolThickness en conséquence
             Tool.toolThickness = thickness;
+        },
+        generateToolsList: function () {
+            var $toolsHolder = $("#tools-holder");
+            var $tool;
+            $.each(tools, function (tool) {
+                $tool = $("<button class='" + tool + "' attr-tool='" + tool + "'>" + tool + "</button>");
+                $tool.appendTo($toolsHolder);
+            });
         },
         addLayer: function () {
             var nextLayer = this.getLastLayerId() + 1;
