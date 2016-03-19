@@ -6,6 +6,7 @@
     <meta name="escription" content="En voila un My_Paint qu'il est beau !" />
     <link rel="stylesheet" type="text/css" href="style/style.css" />
     <script type="text/javascript" src="script/jquery-1.12.1.min.js"></script>
+    <script type="text/javascript" src="script/tools.js"></script>
     <script type="text/javascript" src="script/mypaint.js"></script>
 </head>
 <body>
@@ -35,7 +36,7 @@
                 </div>
                 <div id="tool-form">
                     <label for="tool-thickness">Largeur de l'outil : </label>
-                    <input type="number" name="tool-thickness" id="tool-thickness" value="5" />
+                    <input type="number" name="tool-thickness" id="tool-thickness" />
                 </div>
                 <div id="tool-color">
                     <input type="color"  name="color-hexa" class="color-hexa" />
@@ -58,6 +59,9 @@
                 </div>
                 <div id="tool-new-layer">
                     <button id="new-layer">Nouveau Calque</button>
+                </div>
+                <div id="tools-holder">
+                    <button class="pencil" attr-tool="pencil">Pencil</button>
                 </div>
                 <div class="layers-list-holder">
                 </div>

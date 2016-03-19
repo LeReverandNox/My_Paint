@@ -1,5 +1,5 @@
-/*jslint browser this */
-/*global alert $ */
+/*jslint browser this for bitwise */
+/*global alert $ Tool pencil toolFactory */
 
 (function () {
     "use strict";
@@ -28,13 +28,15 @@
             l: null
         },
         layers: [],
-        currentLayer: null,
+        currentContext: null,
+        currentTool: null,
+        currentToolName: "pencil",
 
         init: function () {
             this.canvas = document.querySelector("#canvas-base");
             this.context = this.canvas.getContext("2d");
 
-            this.currentLayer = this.context;
+            Tool.currentContext = this.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
             this.inputHeight = document.querySelector("#canvas-height");
@@ -46,6 +48,9 @@
 
             this.setDimensions();
 
+            this.setToolSize();
+
+            this.currentTool = toolFactory.new(this.currentToolName);
         },
         setDimensions: function () {
             // On définit la taille du holder
@@ -54,8 +59,8 @@
             holder.style.height = this.canvasSize.height + "px";
 
             // On définit la taille interne du canvas
-            this.context.width = this.canvasSize.width;
-            this.context.height = this.canvasSize.height;
+            this.context.canvas.width = this.canvasSize.width;
+            this.context.canvas.height = this.canvasSize.height;
 
             // Ainsi que sa taille visuelle
             this.canvas.style.width = this.canvasSize.width + "px";
@@ -73,6 +78,27 @@
             document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
             document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
+            document.querySelector("#tools-holder").addEventListener("click", this.setCurrentTool.bind(this));
+
+            document.querySelector(".canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
+            document.querySelector(".canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
+            document.querySelector(".canvas-holder").addEventListener("mouseup", this.onMouseUp.bind(this));
+        },
+        onMouseDown: function (mouse) {
+            // console.log("On mousedown" + mouse);
+            this.currentTool = toolFactory.new(this.currentToolName);
+            this.currentTool.handleMouseDown(mouse);
+        },
+        onMouseMove: function (mouse) {
+            // console.log("On mousemove" + mouse);
+            this.currentTool.handleMouseMove(mouse);
+        },
+        onMouseUp: function (mouse) {
+            // console.log("On mouseup" + mouse);
+            this.currentTool.handleMouseUp(mouse);
+        },
+        setCurrentTool: function (tools) {
+            this.currentToolName = tools.target.getAttribute("attr-tool");
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
@@ -108,13 +134,13 @@
             // On récupère la value de l'input tool-thickness
             var inputThickness = document.querySelector("#tool-thickness");
             var thickness = (isNaN(parseInt(inputThickness.value, 10)) || inputThickness.value < 1)
-                ? this.toolThickness
+                ? Tool.toolThickness
                 : inputThickness.value;
 
             // On reaffiche la valeur au cas ou le gars a entré de la merde dans l'input
             inputThickness.value = thickness;
             // Et on modifie toolThickness en conséquence
-            this.toolThickness = thickness;
+            Tool.toolThickness = thickness;
         },
         addLayer: function () {
             var nextLayer = this.getLastLayerId() + 1;
@@ -135,14 +161,14 @@
             var canva = document.querySelector("#layer-" + nextLayer);
             var context = canva.getContext("2d");
 
-            context.width = this.canvasSize.width;
-            context.height = this.canvasSize.height;
+            context.canvas.width = this.canvasSize.width;
+            context.canvas.height = this.canvasSize.height;
 
             context.beginPath();
             context.moveTo(nextLayer * 5, 5);
             context.lineTo(nextLayer * 5, 50);
-            context.strokeStyle = this.toolColorHex;
-            context.lineWidth = this.toolThickness;
+            context.strokeStyle = Tool.toolColorHex;
+            context.lineWidth = Tool.toolThickness;
             context.stroke();
 
             layer.id = nextLayer;
@@ -198,12 +224,8 @@
             });
 
             $layersList.appendTo($layersListHolder);
-
-            console.log(this.currentLayer);
-
         },
-        toggleLayer: function (layer, $layer, num) {
-            console.log("On va hide le calque " + num);
+        toggleLayer: function (layer, $layer) {
             if (false === $layer.hasClass("hidden")) {
                 $layer.addClass("hidden");
                 layer.hidden = true;
@@ -218,14 +240,13 @@
 
             while (true === again) {
                 if (undefined === this.layers[i] || this.layers[i].hidden === false) {
-                    this.currentLayer = i;
+                    Tool.currentContext = i;
                     again = false;
                 }
                 i -= 1;
             }
         },
-        deleteLayer: function (layer, $layer, num) {
-            console.log("On va delete le calque " + num);
+        deleteLayer: function (layer, $layer) {
             var index = this.layers.indexOf(layer);
             this.layers.splice(index, 1);
 
@@ -260,51 +281,49 @@
             var layer = this.grepOne(this.layers, "id", num);
             var $layer = $("#layer-" + num);
 
-            console.log("On a cliqué sur le calque " + num);
-
             switch (e.target.className) {
             case "layer-hide":
-                this.toggleLayer(layer, $layer, num);
+                this.toggleLayer(layer, $layer);
                 break;
             case "layer-delete":
-                this.deleteLayer(layer, $layer, num);
+                this.deleteLayer(layer, $layer);
                 break;
             case "layer-up":
-                this.moveLayerUp(layer, $layer, num);
+                this.moveLayerUp(layer, $layer);
                 break;
             case "layer-down":
-                this.moveLayerDown(layer, $layer, num);
+                this.moveLayerDown(layer, $layer);
                 break;
             case "layer-active":
-                this.activateLayer(layer, num);
+                this.activateLayer(layer);
                 break;
             }
 
             this.recalculateOrder();
             this.updateLayersList();
         },
-        activateLayer: function (layer, num) {
+        activateLayer: function (layer) {
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
             });
             layer.active = true;
 
-            this.currentLayer = layer.context;
+            Tool.currentContext = layer.context;
         },
         verifyCurrentLayer: function (layer) {
             var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
             layersForDisplay.sort(this.comparator);
-            var lastLayer  = layersForDisplay.length >= 1
+            var lastLayer = layersForDisplay.length >= 1
                 ? layersForDisplay[layersForDisplay.length - 1]
                 : null;
 
             if (layer.active === true) {
                 if (lastLayer === null) {
-                    this.currentLayer = this.context;
+                    Tool.currentContext = this.context;
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
                     layerToActivate.active = true;
-                    this.currentLayer = layerToActivate.context;
+                    Tool.currentContext = layerToActivate.context;
                 }
             }
         },
@@ -317,7 +336,7 @@
                 layer2.order = layersForDisplay.indexOf(layer) + 1;
             });
         },
-        moveLayerUp: function (layer, $layer, num) {
+        moveLayerUp: function (layer, $layer) {
             if (layer.order === 1) {
                 return false;
             }
@@ -331,7 +350,7 @@
             $layer.css({"z-index": layer.order - 1});
             $previousLayer.css({"z-index": previousLayer.order + 1});
         },
-        moveLayerDown: function (layer, $layer, num) {
+        moveLayerDown: function (layer, $layer) {
             if (layer.order === this.layers.length) {
                 return false;
             }
@@ -361,25 +380,25 @@
         initColors: function () {
             // On set la value de l'input Hexa
             var inputHexa = document.querySelector(".color-hexa");
-            inputHexa.value = this.toolColorHex;
+            inputHexa.value = Tool.toolColorHex;
 
             // On converti l'hexa en RGB
-            this.toolColorRGB = this.hexToRGB(this.toolColorHex);
+            Tool.toolColorRGB = this.hexToRGB(Tool.toolColorHex);
 
             // On récupère les inputs RGB et on leur asigne les valeurs RGB
             var inputsRGB = document.getElementsByClassName("color-rgb");
-            inputsRGB[0].value = this.toolColorRGB.r;
-            inputsRGB[1].value = this.toolColorRGB.g;
-            inputsRGB[2].value = this.toolColorRGB.b;
+            inputsRGB[0].value = Tool.toolColorRGB.r;
+            inputsRGB[1].value = Tool.toolColorRGB.g;
+            inputsRGB[2].value = Tool.toolColorRGB.b;
 
             // On converti le RGB en HSL
-            this.toolColorHSL = this.rgbToHSL(this.toolColorRGB);
+            Tool.toolColorHSL = this.rgbToHSL(Tool.toolColorRGB);
 
             // On récupère les inputs RGB et on leur asigne les valeurs RGB
             var inputsHSL = document.getElementsByClassName("color-hsl");
-            inputsHSL[0].value = this.toolColorHSL.h;
-            inputsHSL[1].value = this.toolColorHSL.s;
-            inputsHSL[2].value = this.toolColorHSL.l;
+            inputsHSL[0].value = Tool.toolColorHSL.h;
+            inputsHSL[1].value = Tool.toolColorHSL.s;
+            inputsHSL[2].value = Tool.toolColorHSL.l;
         },
         updateColor: function (e) {
             switch (e.target.className) {
@@ -396,34 +415,32 @@
         },
         updateFromHex: function () {
             var inputHexa = document.querySelector(".color-hexa");
-            this.toolColorHex = inputHexa.value;
+            Tool.toolColorHex = inputHexa.value;
             this.initColors();
         },
         updateFromRGB: function () {
-            // On garde une référence vers this, car on la perd dans le each sinon
-            var self = this;
-            var val, tmp;
+            var val;
+            var tmp;
 
             // Petit each jQuery, la facilité !
-            $.each(this.toolColorRGB, function (index, value) {
+            $.each(Tool.toolColorRGB, function (index, value) {
                 tmp = document.querySelector("#color-" + index).value;
                 val = (tmp > 255 || tmp < 0)
                     ? value
                     : tmp;
 
-                self.toolColorRGB[index] = val;
+                Tool.toolColorRGB[index] = val;
             });
 
-            this.toolColorHex = this.rgbToHex(this.toolColorRGB);
+            Tool.toolColorHex = this.rgbToHex(Tool.toolColorRGB);
             this.initColors();
         },
         updateFromHSL: function () {
-            // On garde une référence vers this, car on la perd dans le each sinon
-            var self = this;
-            var val, tmp;
+            var val;
+            var tmp;
 
             // Petit each jQuery, la facilité !
-            $.each(this.toolColorHSL, function (index, value) {
+            $.each(Tool.toolColorHSL, function (index, value) {
                 tmp = document.querySelector("#color-" + index).value;
                 if (index === "h") {
                     val = (tmp > 359 || tmp < 0)
@@ -435,11 +452,11 @@
                         : tmp;
                 }
 
-                self.toolColorHSL[index] = val;
+                Tool.toolColorHSL[index] = val;
             });
 
-            this.toolColorRGB = this.hslToRGB(this.toolColorHSL);
-            this.toolColorHex = this.rgbToHex(this.toolColorRGB);
+            Tool.toolColorRGB = this.hslToRGB(Tool.toolColorHSL);
+            Tool.toolColorHex = this.rgbToHex(Tool.toolColorRGB);
             this.initColors();
         },
         hexToRGB: function (hex) {
@@ -506,7 +523,9 @@
             var h = hsl.h;
             var s = hsl.s;
             var l = hsl.l;
-            var m, c, x;
+            var m;
+            var c;
+            var x;
 
             h /= 60;
             if (h < 0) {
