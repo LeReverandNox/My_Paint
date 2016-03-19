@@ -164,12 +164,12 @@
             context.canvas.width = this.canvasSize.width;
             context.canvas.height = this.canvasSize.height;
 
-            context.beginPath();
-            context.moveTo(nextLayer * 5, 5);
-            context.lineTo(nextLayer * 5, 50);
-            context.strokeStyle = Tool.toolColorHex;
-            context.lineWidth = Tool.toolThickness;
-            context.stroke();
+            // context.beginPath();
+            // context.moveTo(nextLayer * 5, 5);
+            // context.lineTo(nextLayer * 5, 50);
+            // context.strokeStyle = Tool.toolColorHex;
+            // context.lineWidth = Tool.toolThickness;
+            // context.stroke();
 
             layer.id = nextLayer;
             layer.canva = canva;
