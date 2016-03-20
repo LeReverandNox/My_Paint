@@ -155,7 +155,7 @@
                     x: mouse.layerX - this.origin.x,
                     y: mouse.layerY - this.origin.y
                 };
-                var radius = Math.sqrt((Math.pow(dist.x, 2) + Math.pow(dist.y, 2)));
+                var radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
 
                 this.tmpContext.lineCap = this.toolEnd;
                 this.tmpContext.strokeStyle = this.toolColorHex;
