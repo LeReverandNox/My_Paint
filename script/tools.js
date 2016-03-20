@@ -7,7 +7,8 @@
     var tools = {
         pencil: null,
         eraser: null,
-        rectangle: null
+        rectangle: null,
+        circle: null
     };
 
     var Tool = {
@@ -101,11 +102,12 @@
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
 
-            this.tmpContext.beginPath();
             this.tmpContext.moveTo(mouse.layerX, mouse.layerY);
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
+                this.tmpContext.beginPath();
+
                 this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
 
                 var dist = {
@@ -118,12 +120,55 @@
                 this.tmpContext.strokeStyle = this.toolColorHex;
                 this.tmpContext.lineWidth = this.toolThickness;
 
+                this.tmpContext.rect(this.origin.x, this.origin.y, dist.x, dist.y);
                 if (this.toolFIll === true) {
                     this.tmpContext.fillStyle = this.toolColorHex;
-                    this.tmpContext.fillRect(this.origin.x, this.origin.y, dist.x, dist.y);
+                    this.tmpContext.fill();
                 } else {
-                    this.tmpContext.strokeRect(this.origin.x, this.origin.y, dist.x, dist.y);
+                    this.tmpContext.stroke();
                 }
+            }
+        },
+        handleMouseUp: function (mouse) {
+            this.click1 = false;
+            this.currentContext.globalCompositeOperation = "source-over";
+            this.currentContext.drawImage(this.tmpCanvas, 0, 0);
+            this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
+
+        }
+    };
+    tools.circle = {
+        handleMouseDown: function (mouse) {
+            this.click1 = true;
+            this.origin.x = mouse.layerX;
+            this.origin.y = mouse.layerY;
+
+            this.tmpContext.moveTo(mouse.layerX, mouse.layerY);
+        },
+        handleMouseMove: function (mouse) {
+            if (this.click1 === true) {
+                this.tmpContext.beginPath();
+
+                this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
+
+                var dist = {
+                    x: mouse.layerX - this.origin.x,
+                    y: mouse.layerY - this.origin.y
+                };
+                var radius = Math.sqrt((Math.pow(dist.x, 2) + Math.pow(dist.y, 2)));
+
+                this.tmpContext.lineCap = this.toolEnd;
+                this.tmpContext.strokeStyle = this.toolColorHex;
+                this.tmpContext.lineWidth = this.toolThickness;
+                this.tmpContext.arc(this.origin.x, this.origin.y, radius, 0, Math.PI * 2);
+
+                if (this.toolFIll === true) {
+                    this.tmpContext.fillStyle = this.toolColorHex;
+                    this.tmpContext.fill();
+                } else {
+                    this.tmpContext.stroke();
+                }
+                this.tmpContext.closePath();
             }
         },
         handleMouseUp: function (mouse) {
