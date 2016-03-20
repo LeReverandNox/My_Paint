@@ -14,6 +14,10 @@
             hidden: false,
             active: true
         },
+        tmp: {
+            canvas: null,
+            context: null
+        },
         canvasSize: {
             width: 640,
             height: 480
@@ -41,7 +45,15 @@
             this.background.canvas = document.querySelector("#canvas-base");
             this.background.context = this.background.canvas.getContext("2d");
 
+            this.tmp.canvas = document.querySelector("#canvas-tmp");
+            this.tmp.context = this.tmp.canvas.getContext("2d");
+
+
+            Tool.currentCanvas = this.background.cavas;
             Tool.currentContext = this.background.context;
+
+            Tool.tmpCanvas = this.tmp.canvas;
+            Tool.tmpContext = this.tmp.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
             this.inputHeight = document.querySelector("#canvas-height");
@@ -61,21 +73,28 @@
         },
         setDimensions: function () {
             // On définit la taille du holder
-            var holder = document.querySelector(".canvas-holder");
+            var holder = document.querySelector(".big-canvas-holder");
             holder.style.width = this.canvasSize.width + "px";
             holder.style.height = this.canvasSize.height + "px";
 
             // On définit la taille interne du canvas
             this.background.context.canvas.width = this.canvasSize.width;
             this.background.context.canvas.height = this.canvasSize.height;
+            this.tmp.context.canvas.width = this.canvasSize.width;
+            this.tmp.context.canvas.height = this.canvasSize.height;
 
             // Ainsi que sa taille visuelle
             this.background.canvas.style.width = this.canvasSize.width + "px";
             this.background.canvas.style.height = this.canvasSize.height + "px";
+            this.tmp.canvas.style.width = this.canvasSize.width + "px";
+            this.tmp.canvas.style.height = this.canvasSize.height + "px";
 
             // On assigne ces dimensions aux values des inputs
             this.inputWidth.value = this.canvasSize.width;
             this.inputHeight.value = this.canvasSize.height;
+
+            Tool.contextWidth = this.canvasSize.width;
+            Tool.contextHeight = this.canvasSize.height;
 
             this.updateLayersList();
         },
@@ -89,9 +108,9 @@
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
             document.querySelector("#tools-holder").addEventListener("click", this.setCurrentTool.bind(this));
 
-            document.querySelector(".canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
-            document.querySelector(".canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
-            document.querySelector(".canvas-holder").addEventListener("mouseup", this.onMouseUp.bind(this));
+            document.querySelector(".big-canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
+            document.querySelector(".big-canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
+            document.querySelector(".big-canvas-holder").addEventListener("mouseup", this.onMouseUp.bind(this));
         },
         onMouseDown: function (mouse) {
             // console.log("On mousedown" + mouse);
@@ -355,6 +374,7 @@
             });
             this.background.active = true;
 
+            Tool.currentCanvas = this.background.canvas;
             Tool.currentContext = this.background.context;
         },
         activateLayer: function (layer) {
@@ -365,6 +385,7 @@
 
             layer.active = true;
 
+            Tool.currentCanvas = layer.canvas;
             Tool.currentContext = layer.context;
         },
         verifyCurrentLayer: function (layer) {
@@ -377,10 +398,12 @@
             if (layer.active === true) {
                 if (lastLayer === null) {
                     this.background.active = true;
+                    Too.currentCanvas = this.background.canvas;
                     Tool.currentContext = this.background.context;
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
                     layerToActivate.active = true;
+                    Too.currentCanvas = layerToActivate.canvas;
                     Tool.currentContext = layerToActivate.context;
                 }
             }
