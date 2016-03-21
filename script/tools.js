@@ -1,5 +1,5 @@
 /*jslint browser this */
-/*global _, utils */
+/*global paint*/
 
 (function (global) {
     "use strict";
@@ -9,7 +9,9 @@
         eraser: null,
         rectangle: null,
         circle: null,
-        line: null
+        line: null,
+        eyedropper: null,
+        paintbucket: null
     };
 
     var Tool = {
@@ -82,7 +84,7 @@
                 this.currentContext.stroke();
             }
         },
-        handleMouseUp: function (mouse) {
+        handleMouseUp: function () {
             this.click1 = false;
         }
     };
@@ -105,7 +107,7 @@
                 this.currentContext.stroke();
             }
         },
-        handleMouseUp: function (mouse) {
+        handleMouseUp: function () {
             this.click1 = false;
             this.currentContext.globalCompositeOperation = "source-over";
         }
@@ -141,7 +143,7 @@
                 this.tmpContext.closePath();
             }
         },
-        handleMouseUp: function (mouse) {
+        handleMouseUp: function () {
             this.click1 = false;
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
@@ -179,7 +181,7 @@
                 this.tmpContext.closePath();
             }
         },
-        handleMouseUp: function (mouse) {
+        handleMouseUp: function () {
             this.click1 = false;
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
@@ -213,12 +215,57 @@
                 this.tmpContext.closePath();
             }
         },
-        handleMouseUp: function (mouse) {
+        handleMouseUp: function () {
             this.click1 = false;
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
         }
     };
+    tools.eyedropper = {
+        handleMouseDown: function (mouse) {
+            this.origin.x = mouse.layerX;
+            this.origin.y = mouse.layerY;
+
+            var arrRgb = this.currentContext.getImageData(this.origin.x, this.origin.y, 1, 1).data;
+            var rgb = {
+                r: arrRgb[0],
+                g: arrRgb[1],
+                b: arrRgb[2]
+            };
+
+            Tool.toolStrokeColorHex = paint.rgbToHex(rgb);
+            Tool.toolFillColorHex = paint.rgbToHex(rgb);
+            console.log(Tool.toolStrokeColorHex);
+            paint.initColors();
+        },
+        handleMouseMove: function () {
+            return;
+        },
+        handleMouseUp: function () {
+            return;
+        }
+    };
+    tools.paintbucket = {
+        handleMouseDown: function (mouse) {
+            this.origin.x = mouse.layerX;
+            this.origin.y = mouse.layerY;
+
+            var arrRgb = this.currentContext.getImageData(this.origin.x, this.origin.y, 1, 1).data;
+            var rgb = {
+                r: arrRgb[0],
+                g: arrRgb[1],
+                b: arrRgb[2]
+            };
+            var color = paint.rgbToHex(rgb);
+            console.log(rgb, arrRgb, color);
+        },
+        handleMouseMove: function () {
+            return;
+        },
+        handleMouseUp: function () {
+            return;
+        }
+    }
 
     // Expose l'objet à l'exterieur du scope de la fonction.
     // Depuis l'extérieur, vous pouvez l'utilisé ainsi :

@@ -76,6 +76,9 @@ h1 {
     border-radius: 5px;
     cursor: crosshair;
     position: relative;
+    background-image: url('transparent.jpg');
+}
+#canvas-base {
 }
 #canvas-base, #canvas-tmp, .canvas-layer{
     position: absolute;

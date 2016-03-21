@@ -1,7 +1,7 @@
 /*jslint browser this for bitwise */
 /*global alert $ Tool tools toolFactory URL */
 
-(function () {
+(function (global) {
     "use strict";
 
     var paint = {
@@ -636,10 +636,14 @@
             RGB.b = hex & 0xFF;
             return RGB;
         },
+        componentToHex: function (c) {
+            var hex = c.toString(16);
+            return hex.length === 1
+                ? "0" + hex
+                : hex;
+        },
         rgbToHex: function (rgb) {
-            var bin = rgb.r << 16 | rgb.g << 8 | rgb.b;
-
-            return "#" + bin.toString(16);
+            return "#" + this.componentToHex(rgb.r) + this.componentToHex(rgb.g) + this.componentToHex(rgb.b);
         },
         rgbToHSL: function (rgb) {
             var rgb2 = {};
@@ -746,5 +750,5 @@
     document.addEventListener("DOMContentLoaded", function () {
         paint.init();
     });
-
-}());
+    global.paint = paint;
+}(this));
