@@ -102,20 +102,17 @@
             document.querySelector(".big-canvas-holder").addEventListener("mouseup", this.onMouseUp.bind(this));
         },
         onMouseDown: function (mouse) {
-            // console.log("On mousedown" + mouse);
-            this.currentTool = toolFactory.new(this.currentToolName);
             this.currentTool.handleMouseDown(mouse);
         },
         onMouseMove: function (mouse) {
-            // console.log("On mousemove" + mouse);
             this.currentTool.handleMouseMove(mouse);
         },
         onMouseUp: function (mouse) {
-            // console.log("On mouseup" + mouse);
             this.currentTool.handleMouseUp(mouse);
         },
         setCurrentTool: function (tools) {
             this.currentToolName = tools.target.getAttribute("attr-tool");
+            this.currentTool = toolFactory.new(this.currentToolName);
         },
         resizeCanvas: function () {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut

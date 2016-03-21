@@ -58,7 +58,9 @@
 
     var toolFactory = {
         new: function (tool) {
-            var newTool = Object.assign({}, Tool, tools[tool]);
+            var newTool = Object.create(Tool);
+            Object.assign(newTool, tools[tool]);
+
             return newTool;
         }
     };
@@ -73,7 +75,6 @@
                 this.destination.x = mouse.layerX;
                 this.destination.y = mouse.layerY;
 
-                this.currentContext.globalCompositeOperation = "source-over";
                 this.currentContext.lineCap = this.toolEnd;
                 this.currentContext.lineTo(this.destination.x, this.destination.y);
                 this.currentContext.strokeStyle = this.toolStrokeColorHex;
@@ -106,6 +107,7 @@
         },
         handleMouseUp: function (mouse) {
             this.click1 = false;
+            this.currentContext.globalCompositeOperation = "source-over";
         }
     };
     tools.rectangle = {
@@ -141,7 +143,6 @@
         },
         handleMouseUp: function (mouse) {
             this.click1 = false;
-            this.currentContext.globalCompositeOperation = "source-over";
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
 
@@ -180,7 +181,6 @@
         },
         handleMouseUp: function (mouse) {
             this.click1 = false;
-            this.currentContext.globalCompositeOperation = "source-over";
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
 
@@ -215,7 +215,6 @@
         },
         handleMouseUp: function (mouse) {
             this.click1 = false;
-            this.currentContext.globalCompositeOperation = "source-over";
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
         }
