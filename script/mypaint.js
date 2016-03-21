@@ -1,5 +1,5 @@
 /*jslint browser this for bitwise */
-/*global alert $ Tool tools toolFactory */
+/*global alert $ Tool tools toolFactory URL */
 
 (function () {
     "use strict";
@@ -100,6 +100,24 @@
             document.querySelector(".big-canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
             document.querySelector(".big-canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
             document.querySelector(".big-canvas-holder").addEventListener("mouseup", this.onMouseUp.bind(this));
+
+            document.querySelector(".big-canvas-holder").addEventListener("dragover", this.preventDrag);
+            document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
+        },
+        preventDrag: function (event) {
+            event.preventDefault();
+        },
+        importOnDrop: function (event) {
+            event.preventDefault();
+            var self = this;
+            var dt = event.dataTransfer;
+            var file = dt.files[0];
+            var img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = function () {
+                self.resizeCanvas(img.width, img.height);
+                Tool.currentContext.drawImage(img, 0, 0);
+            };
         },
         onMouseDown: function (mouse) {
             this.currentTool.handleMouseDown(mouse);
@@ -114,15 +132,21 @@
             this.currentToolName = tools.target.getAttribute("attr-tool");
             this.currentTool = toolFactory.new(this.currentToolName);
         },
-        resizeCanvas: function () {
+        resizeCanvas: function (widthTo, heightTo) {
             // On vérifie que les inputs contiennent bien des int, sinon on assigne les valeurs par défaut
-            var width = (isNaN(parseInt(this.inputWidth.value, 10)) || this.inputWidth.value < 1)
-                ? this.canvasSize.width
-                : this.inputWidth.value;
-            var height = (isNaN(parseInt(this.inputHeight.value, 10)) || this.inputHeight.value < 1)
-                ? this.canvasSize.height
-                : this.inputHeight.value;
-
+            var width;
+            var height;
+            if (undefined === heightTo) {
+                width = (isNaN(parseInt(this.inputWidth.value, 10)) || this.inputWidth.value < 1)
+                    ? this.canvasSize.width
+                    : this.inputWidth.value;
+                height = (isNaN(parseInt(this.inputHeight.value, 10)) || this.inputHeight.value < 1)
+                    ? this.canvasSize.height
+                    : this.inputHeight.value;
+            } else {
+                width = widthTo;
+                height = heightTo;
+            }
              // On assigne ces valeurs dans canvasSize
             this.canvasSize.width = width;
             this.canvasSize.height = height;
