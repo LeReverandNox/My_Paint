@@ -450,84 +450,134 @@
         },
         initColors: function () {
             // On set la value de l'input Hexa
-            var inputHexa = document.querySelector(".color-hexa");
-            inputHexa.value = Tool.toolColorHex;
+            var inputStrokeHexa = document.querySelector(".color-hexa-stroke");
+            var inputFillHexa = document.querySelector(".color-hexa-fill");
+            inputStrokeHexa.value = Tool.toolStrokeColorHex;
+            inputFillHexa.value = Tool.toolFillColorHex;
 
             // On converti l'hexa en RGB
-            Tool.toolColorRGB = this.hexToRGB(Tool.toolColorHex);
+            Tool.toolStrokeColorRGB = this.hexToRGB(Tool.toolStrokeColorHex);
+            Tool.toolFillColorRGB = this.hexToRGB(Tool.toolFillColorHex);
 
             // On récupère les inputs RGB et on leur asigne les valeurs RGB
-            var inputsRGB = document.getElementsByClassName("color-rgb");
-            inputsRGB[0].value = Tool.toolColorRGB.r;
-            inputsRGB[1].value = Tool.toolColorRGB.g;
-            inputsRGB[2].value = Tool.toolColorRGB.b;
+            var inputsStrokeRGB = document.getElementsByClassName("color-rgb-stroke");
+            inputsStrokeRGB[0].value = Tool.toolStrokeColorRGB.r;
+            inputsStrokeRGB[1].value = Tool.toolStrokeColorRGB.g;
+            inputsStrokeRGB[2].value = Tool.toolStrokeColorRGB.b;
+
+            var inputsFillRGB = document.getElementsByClassName("color-rgb-fill");
+            inputsFillRGB[0].value = Tool.toolFillColorRGB.r;
+            inputsFillRGB[1].value = Tool.toolFillColorRGB.g;
+            inputsFillRGB[2].value = Tool.toolFillColorRGB.b;
 
             // On converti le RGB en HSL
-            Tool.toolColorHSL = this.rgbToHSL(Tool.toolColorRGB);
+            Tool.toolStrokeColorHSL = this.rgbToHSL(Tool.toolStrokeColorRGB);
+            Tool.toolFillColorHSL = this.rgbToHSL(Tool.toolFillColorRGB);
 
             // On récupère les inputs RGB et on leur asigne les valeurs RGB
-            var inputsHSL = document.getElementsByClassName("color-hsl");
-            inputsHSL[0].value = Tool.toolColorHSL.h;
-            inputsHSL[1].value = Tool.toolColorHSL.s;
-            inputsHSL[2].value = Tool.toolColorHSL.l;
+            var inputsStrokeHSL = document.getElementsByClassName("color-hsl-stroke");
+            inputsStrokeHSL[0].value = Tool.toolStrokeColorHSL.h;
+            inputsStrokeHSL[1].value = Tool.toolStrokeColorHSL.s;
+            inputsStrokeHSL[2].value = Tool.toolStrokeColorHSL.l;
+
+            var inputsFillHSL = document.getElementsByClassName("color-hsl-fill");
+            inputsFillHSL[0].value = Tool.toolFillColorHSL.h;
+            inputsFillHSL[1].value = Tool.toolFillColorHSL.s;
+            inputsFillHSL[2].value = Tool.toolFillColorHSL.l;
         },
         updateColor: function (e) {
-            switch (e.target.className) {
+            var mode = e.target.getAttribute("attr-mode");
+
+            // On switch sur la premiere classe... technique de gitan
+            switch (e.target.className.split(" ")[0]) {
             case "color-hexa":
-                this.updateFromHex();
+                this.updateFromHex(mode);
                 break;
             case "color-rgb":
-                this.updateFromRGB();
+                this.updateFromRGB(mode);
                 break;
             case "color-hsl":
-                this.updateFromHSL();
+                this.updateFromHSL(mode);
                 break;
             }
         },
-        updateFromHex: function () {
-            var inputHexa = document.querySelector(".color-hexa");
-            Tool.toolColorHex = inputHexa.value;
+        updateFromHex: function (mode) {
+            if (mode === "stroke") {
+                var inputStrokeHexa = document.querySelector(".color-hexa-stroke");
+                Tool.toolStrokeColorHex = inputStrokeHexa.value;
+            } else if (mode === "fill") {
+                var inputFillHexa = document.querySelector(".color-hexa-fill");
+                Tool.toolFillColorHex = inputFillHexa.value;
+            }
             this.initColors();
         },
-        updateFromRGB: function () {
+        updateFromRGB: function (mode) {
             var val;
             var tmp;
 
             // Petit each jQuery, la facilité !
-            $.each(Tool.toolColorRGB, function (index, value) {
-                tmp = document.querySelector("#color-" + index).value;
-                val = (tmp > 255 || tmp < 0)
-                    ? value
-                    : tmp;
+            if (mode === "stroke") {
+                $.each(Tool.toolStrokeColorRGB, function (index, value) {
+                    tmp = document.querySelector("#stroke-color-" + index).value;
+                    val = (tmp > 255 || tmp < 0)
+                        ? value
+                        : tmp;
+                    Tool.toolStrokeColorRGB[index] = val;
+                });
+                Tool.toolStrokeColorHex = this.rgbToHex(Tool.toolStrokeColorRGB);
+            } else if (mode === "fill") {
+                $.each(Tool.toolFillColorRGB, function (index, value) {
+                    tmp = document.querySelector("#fill-color-" + index).value;
+                    val = (tmp > 255 || tmp < 0)
+                        ? value
+                        : tmp;
+                    Tool.toolFillColorRGB[index] = val;
+                });
+                Tool.toolFillColorHex = this.rgbToHex(Tool.toolFillColorRGB);
+            }
 
-                Tool.toolColorRGB[index] = val;
-            });
-
-            Tool.toolColorHex = this.rgbToHex(Tool.toolColorRGB);
             this.initColors();
         },
-        updateFromHSL: function () {
+        updateFromHSL: function (mode) {
             var val;
             var tmp;
 
             // Petit each jQuery, la facilité !
-            $.each(Tool.toolColorHSL, function (index, value) {
-                tmp = document.querySelector("#color-" + index).value;
-                if (index === "h") {
-                    val = (tmp > 359 || tmp < 0)
-                        ? value
-                        : tmp;
-                } else {
-                    val = (tmp > 100 || tmp < 0)
-                        ? value
-                        : tmp;
-                }
+            if (mode === "stroke") {
+                $.each(Tool.toolStrokeColorHSL, function (index, value) {
+                    tmp = document.querySelector("#stroke-color-" + index).value;
+                    if (index === "h") {
+                        val = (tmp > 359 || tmp < 0)
+                            ? value
+                            : tmp;
+                    } else {
+                        val = (tmp > 100 || tmp < 0)
+                            ? value
+                            : tmp;
+                    }
 
-                Tool.toolColorHSL[index] = val;
-            });
+                    Tool.toolStrokeColorHSL[index] = val;
+                });
+                Tool.toolStrokeColorRGB = this.hslToRGB(Tool.toolStrokeColorHSL);
+                Tool.toolStrokeColorHex = this.rgbToHex(Tool.toolStrokeColorRGB);
+            } else if (mode === "fill") {
+                $.each(Tool.toolFillColorHSL, function (index, value) {
+                    tmp = document.querySelector("#fill-color-" + index).value;
+                    if (index === "h") {
+                        val = (tmp > 359 || tmp < 0)
+                            ? value
+                            : tmp;
+                    } else {
+                        val = (tmp > 100 || tmp < 0)
+                            ? value
+                            : tmp;
+                    }
 
-            Tool.toolColorRGB = this.hslToRGB(Tool.toolColorHSL);
-            Tool.toolColorHex = this.rgbToHex(Tool.toolColorRGB);
+                    Tool.toolFillColorHSL[index] = val;
+                });
+                Tool.toolFillColorRGB = this.hslToRGB(Tool.toolFillColorHSL);
+                Tool.toolFillColorHex = this.rgbToHex(Tool.toolFillColorRGB);
+            }
             this.initColors();
         },
         hexToRGB: function (hex) {

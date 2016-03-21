@@ -22,13 +22,24 @@
         toolThickness: 10,
         toolEnd: "round",
         toolFIll: false,
-        toolColorHex: "#00ff2c",
-        toolColorRGB: {
+        toolStrokeColorHex: "#00ff2c",
+        toolStrokeColorRGB: {
             r: null,
             g: null,
             b: null
         },
-        toolColorHSL: {
+        toolStrokeColorHSL: {
+            h: null,
+            s: null,
+            l: null
+        },
+        toolFillColorHex: "#ff0000",
+        toolFillColorRGB: {
+            r: null,
+            g: null,
+            b: null
+        },
+        toolFillColorHSL: {
             h: null,
             s: null,
             l: null
@@ -65,7 +76,7 @@
                 this.currentContext.globalCompositeOperation = "source-over";
                 this.currentContext.lineCap = this.toolEnd;
                 this.currentContext.lineTo(this.destination.x, this.destination.y);
-                this.currentContext.strokeStyle = this.toolColorHex;
+                this.currentContext.strokeStyle = this.toolStrokeColorHex;
                 this.currentContext.lineWidth = this.toolThickness;
                 this.currentContext.stroke();
             }
@@ -88,7 +99,7 @@
                 this.currentContext.globalCompositeOperation = "destination-out";
                 this.currentContext.lineCap = this.toolEnd;
                 this.currentContext.lineTo(this.destination.x, this.destination.y);
-                this.currentContext.strokeStyle = this.toolColorHex;
+                this.currentContext.strokeStyle = this.toolStrokeColorHex;
                 this.currentContext.lineWidth = this.toolThickness;
                 this.currentContext.stroke();
             }
@@ -116,12 +127,12 @@
 
 
                 this.tmpContext.lineCap = this.toolEnd;
-                this.tmpContext.strokeStyle = this.toolColorHex;
+                this.tmpContext.strokeStyle = this.toolStrokeColorHex;
                 this.tmpContext.lineWidth = this.toolThickness;
 
                 this.tmpContext.rect(this.origin.x, this.origin.y, dist.x, dist.y);
                 if (this.toolFIll === true) {
-                    this.tmpContext.fillStyle = this.toolColorHex;
+                    this.tmpContext.fillStyle = this.toolStrokeColorHex;
                     this.tmpContext.fill();
                 } else {
                     this.tmpContext.stroke();
@@ -155,12 +166,12 @@
                 var radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
 
                 this.tmpContext.lineCap = this.toolEnd;
-                this.tmpContext.strokeStyle = this.toolColorHex;
+                this.tmpContext.strokeStyle = this.toolStrokeColorHex;
                 this.tmpContext.lineWidth = this.toolThickness;
                 this.tmpContext.arc(this.origin.x, this.origin.y, radius, 0, Math.PI * 2);
 
                 if (this.toolFIll === true) {
-                    this.tmpContext.fillStyle = this.toolColorHex;
+                    this.tmpContext.fillStyle = this.toolStrokeColorHex;
                     this.tmpContext.fill();
                 } else {
                     this.tmpContext.stroke();
@@ -192,7 +203,7 @@
                 this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
 
                 this.tmpContext.lineCap = this.toolEnd;
-                this.tmpContext.strokeStyle = this.toolColorHex;
+                this.tmpContext.strokeStyle = this.toolStrokeColorHex;
                 this.tmpContext.lineWidth = this.toolThickness;
 
                 this.tmpContext.lineTo(mouse.layerX, mouse.layerY);

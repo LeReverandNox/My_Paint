@@ -42,22 +42,45 @@
                     <input type="number" name="tool-thickness" id="tool-thickness" />
                 </div>
                 <div id="tool-color">
-                    <input type="color"  name="color-hexa" class="color-hexa" />
-                    <div id="tool-color-rgb">
-                        <label for="color-r">R : </label>
-                        <input type="number" name="color-r" class="color-rgb" id="color-r" />
-                        <label for="color-g">G : </label>
-                        <input type="number" name="color-g" class="color-rgb" id="color-g" />
-                        <label for="color-b">B : </label>
-                        <input type="number" name="color-b" class="color-rgb" id="color-b" />
+                    <div id="tool-fill-color">
+                        <p>FIll color</p>
+                        <input type="color"  name="color-hexa" class="color-hexa color-hexa-fill" attr-mode="fill" />
+                        <div id="fill-tool-color-rgb">
+                            <label for="fill-color-r">R : </label>
+                            <input type="number" name="fill-color-r" class="color-rgb color-rgb-fill" id="fill-color-r" attr-mode="fill" />
+                            <label for="fill-color-g">G : </label>
+                            <input type="number" name="fill-color-g" class="color-rgb color-rgb-fill" id="fill-color-g" attr-mode="fill" />
+                            <label for="fill-color-b">B : </label>
+                            <input type="number" name="fill-color-b" class="color-rgb color-rgb-fill" id="fill-color-b" attr-mode="fill" />
+                        </div>
+                        <div id="fill-tool-color-hsl">
+                            <label for="fill-color-h">Hue : </label>
+                            <input type="number" name="fill-color-h" class="color-hsl color-hsl-fill" id="fill-color-h" attr-mode="fill" />
+                            <label for="fill-color-s">Saturation : </label>
+                            <input type="number" name="fill-color-s" class="color-hsl color-hsl-fill" id="fill-color-s" attr-mode="fill" />
+                            <label for="fill-color-l">Lightness : </label>
+                            <input type="number" name="fill-color-l" class="color-hsl color-hsl-fill" id="fill-color-l" attr-mode="fill" />
+                        </div>
                     </div>
-                    <div id="tool-color-hsl">
-                        <label for="color-h">Hue : </label>
-                        <input type="number" name="color-r" class="color-hsl" id="color-h" />
-                        <label for="color-s">Saturation : </label>
-                        <input type="number" name="color-s" class="color-hsl" id="color-s" />
-                        <label for="color-l">Lightness : </label>
-                        <input type="number" name="color-l" class="color-hsl" id="color-l" />
+                    <div id="tool-stroke-color">
+                        <p>Stroke color</p>
+                        <input type="color"  name="color-hexa" class="color-hexa color-hexa-stroke" attr-mode="stroke" />
+                        <div id="stroke-tool-color-rgb">
+                            <label for="stroke-color-r">R : </label>
+                            <input type="number" name="stroke-color-r" class="color-rgb color-rgb-stroke" id="stroke-color-r" attr-mode="stroke" />
+                            <label for="stroke-color-g">G : </label>
+                            <input type="number" name="stroke-color-g" class="color-rgb color-rgb-stroke" id="stroke-color-g" attr-mode="stroke" />
+                            <label for="stroke-color-b">B : </label>
+                            <input type="number" name="stroke-color-b" class="color-rgb color-rgb-stroke" id="stroke-color-b" attr-mode="stroke" />
+                        </div>
+                        <div id="stroke-tool-color-hsl">
+                            <label for="stroke-color-h">Hue : </label>
+                            <input type="number" name="stroke-color-h" class="color-hsl color-hsl-stroke" id="stroke-color-h" attr-mode="stroke" />
+                            <label for="stroke-color-s">Saturation : </label>
+                            <input type="number" name="stroke-color-s" class="color-hsl color-hsl-stroke" id="stroke-color-s" attr-mode="stroke" />
+                            <label for="stroke-color-l">Lightness : </label>
+                            <input type="number" name="stroke-color-l" class="color-hsl color-hsl-stroke" id="stroke-color-l" attr-mode="stroke" />
+                        </div>
                     </div>
                 </div>
                 <div id="tool-new-layer">
