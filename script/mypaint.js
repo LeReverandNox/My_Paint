@@ -115,8 +115,11 @@
             var img = new Image();
             img.src = URL.createObjectURL(file);
             img.onload = function () {
-                self.resizeCanvas(img.width, img.height);
-                Tool.currentContext.drawImage(img, 0, 0);
+                // self.resizeCanvas(img.width, img.height);
+                var x = event.layerX - (img.width / 2);
+                var y = event.layerY - (img.height / 2);
+                Tool.currentContext.drawImage(img, x, y);
+                // Tool.currentContext.drawImage(img, 0, 0);
             };
         },
         onMouseDown: function (mouse) {
