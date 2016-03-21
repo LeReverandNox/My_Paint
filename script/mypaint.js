@@ -103,23 +103,31 @@
 
             document.querySelector(".big-canvas-holder").addEventListener("dragover", this.preventDrag);
             document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
+            document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
         },
         preventDrag: function (event) {
             event.preventDefault();
         },
         importOnDrop: function (event) {
             event.preventDefault();
-            var self = this;
             var dt = event.dataTransfer;
             var file = dt.files[0];
             var img = new Image();
             img.src = URL.createObjectURL(file);
             img.onload = function () {
-                // self.resizeCanvas(img.width, img.height);
                 var x = event.layerX - (img.width / 2);
                 var y = event.layerY - (img.height / 2);
                 Tool.currentContext.drawImage(img, x, y);
-                // Tool.currentContext.drawImage(img, 0, 0);
+            };
+        },
+        uploadImage: function (event) {
+            var self = this;
+            var file = event.target.files[0];
+            var img = new Image();
+            img.src = URL.createObjectURL(file);
+            img.onload = function () {
+                self.resizeCanvas(img.width, img.height);
+                Tool.currentContext.drawImage(img, 0, 0);
             };
         },
         onMouseDown: function (mouse) {
