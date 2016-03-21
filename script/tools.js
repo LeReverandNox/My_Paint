@@ -8,7 +8,8 @@
         pencil: null,
         eraser: null,
         rectangle: null,
-        circle: null
+        circle: null,
+        line: null
     };
 
     var Tool = {
@@ -101,8 +102,6 @@
             this.click1 = true;
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
-
-            this.tmpContext.moveTo(mouse.layerX, mouse.layerY);
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
@@ -142,8 +141,6 @@
             this.click1 = true;
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
-
-            this.tmpContext.moveTo(mouse.layerX, mouse.layerY);
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
@@ -177,6 +174,40 @@
             this.currentContext.drawImage(this.tmpCanvas, 0, 0);
             this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
 
+        }
+    };
+    tools.line = {
+        handleMouseDown: function (mouse) {
+            this.click1 = true;
+            this.origin.x = mouse.layerX;
+            this.origin.y = mouse.layerY;
+
+        },
+        handleMouseMove: function (mouse) {
+            if (this.click1 === true) {
+                this.tmpContext.beginPath();
+
+                this.tmpContext.moveTo(this.origin.x, this.origin.y);
+
+                this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
+
+                this.tmpContext.lineCap = this.toolEnd;
+                this.tmpContext.strokeStyle = this.toolColorHex;
+                this.tmpContext.lineWidth = this.toolThickness;
+
+                this.tmpContext.lineTo(mouse.layerX, mouse.layerY);
+
+                this.tmpContext.stroke();
+                this.tmpContext.fill();
+
+                this.tmpContext.closePath();
+            }
+        },
+        handleMouseUp: function (mouse) {
+            this.click1 = false;
+            this.currentContext.globalCompositeOperation = "source-over";
+            this.currentContext.drawImage(this.tmpCanvas, 0, 0);
+            this.tmpContext.clearRect(0, 0, this.contextWidth, this.contextHeight);
         }
     };
 
