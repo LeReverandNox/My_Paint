@@ -21,7 +21,7 @@
         contextHeight: null,
         toolThickness: 10,
         toolEnd: "round",
-        toolFIll: false,
+        toolFill: false,
         toolStrokeColorHex: "#00ff2c",
         toolStrokeColorRGB: {
             r: null,
@@ -131,12 +131,12 @@
                 this.tmpContext.lineWidth = this.toolThickness;
 
                 this.tmpContext.rect(this.origin.x, this.origin.y, dist.x, dist.y);
-                if (this.toolFIll === true) {
-                    this.tmpContext.fillStyle = this.toolStrokeColorHex;
+                if (this.toolFill === true) {
+                    this.tmpContext.fillStyle = this.toolFillColorHex;
                     this.tmpContext.fill();
-                } else {
-                    this.tmpContext.stroke();
                 }
+                this.tmpContext.stroke();
+                this.tmpContext.closePath();
             }
         },
         handleMouseUp: function (mouse) {
@@ -170,12 +170,11 @@
                 this.tmpContext.lineWidth = this.toolThickness;
                 this.tmpContext.arc(this.origin.x, this.origin.y, radius, 0, Math.PI * 2);
 
-                if (this.toolFIll === true) {
-                    this.tmpContext.fillStyle = this.toolStrokeColorHex;
+                if (this.toolFill === true) {
+                    this.tmpContext.fillStyle = this.toolFillColorHex;
                     this.tmpContext.fill();
-                } else {
-                    this.tmpContext.stroke();
                 }
+                this.tmpContext.stroke();
                 this.tmpContext.closePath();
             }
         },

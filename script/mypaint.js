@@ -53,6 +53,7 @@
             this.setDimensions();
 
             this.setToolSize();
+            this.setToolFillness();
 
             this.generateToolsList();
 
@@ -90,6 +91,7 @@
             document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
             document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.resetSizeCanvas.bind(this));
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
+            document.querySelector("#tool-fillness").addEventListener("click", this.setToolFillness.bind(this));
             document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
             document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
@@ -157,6 +159,17 @@
             inputThickness.value = thickness;
             // Et on modifie toolThickness en conséquence
             Tool.toolThickness = thickness;
+        },
+        setToolFillness: function (click) {
+            var inputFillness = document.querySelector("#tool-fillness");
+            if (undefined !== click) {
+                if (Tool.toolFill === false) {
+                    Tool.toolFill = true;
+                } else {
+                    Tool.toolFill = false;
+                }
+            }
+            inputFillness.checked = Tool.toolFill;
         },
         generateToolsList: function () {
             var $toolsHolder = $("#tools-holder");
