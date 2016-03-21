@@ -24,20 +24,7 @@
         },
         inputWidth: null,
         inputHeight: null,
-        toolThickness: 10,
-        toolColorHex: "#00ff2c",
-        toolColorRGB: {
-            r: null,
-            g: null,
-            b: null
-        },
-        toolColorHSL: {
-            h: null,
-            s: null,
-            l: null
-        },
         layers: [],
-        currentContext: null,
         currentTool: null,
         currentToolName: "pencil",
 
@@ -200,13 +187,6 @@
 
             context.canvas.width = this.canvasSize.width;
             context.canvas.height = this.canvasSize.height;
-
-            // context.beginPath();
-            // context.moveTo(nextLayer * 5, 5);
-            // context.lineTo(nextLayer * 5, 50);
-            // context.strokeStyle = Tool.toolColorHex;
-            // context.lineWidth = Tool.toolThickness;
-            // context.stroke();
 
             layer.id = nextLayer;
             layer.canva = canva;
