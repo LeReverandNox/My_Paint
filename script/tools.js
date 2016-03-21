@@ -10,8 +10,7 @@
         rectangle: null,
         circle: null,
         line: null,
-        eyedropper: null,
-        paintbucket: null
+        eyedropper: null
     };
 
     var Tool = {
@@ -245,27 +244,6 @@
             return;
         }
     };
-    tools.paintbucket = {
-        handleMouseDown: function (mouse) {
-            this.origin.x = mouse.layerX;
-            this.origin.y = mouse.layerY;
-
-            var arrRgb = this.currentContext.getImageData(this.origin.x, this.origin.y, 1, 1).data;
-            var rgb = {
-                r: arrRgb[0],
-                g: arrRgb[1],
-                b: arrRgb[2]
-            };
-            var color = paint.rgbToHex(rgb);
-            console.log(rgb, arrRgb, color);
-        },
-        handleMouseMove: function () {
-            return;
-        },
-        handleMouseUp: function () {
-            return;
-        }
-    }
 
     // Expose l'objet à l'exterieur du scope de la fonction.
     // Depuis l'extérieur, vous pouvez l'utilisé ainsi :
