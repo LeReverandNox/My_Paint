@@ -64,7 +64,24 @@
             y: null
         },
         symHorizontal: false,
-        symVertical: false
+        symVertical: false,
+        symPos: {
+            x: null,
+            y: null
+        },
+        calculateSymPos: function (x, y) {
+            if (this.symHorizontal === true) {
+                this.symPos.x = this.contextWidth - x;
+                this.symPos.y = y;
+
+                if (this.symVertical === true) {
+                    this.symPos.y = this.contextHeight - y;
+                }
+            } else if (this.symVertical === true) {
+                this.symPos.x = x;
+                this.symPos.y = this.contextHeight - y;
+            }
+        }
     };
 
     var toolFactory = {
@@ -80,6 +97,12 @@
             this.click1 = true;
             this.currLayer.context.beginPath();
             this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
+
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.calculateSymPos(mouse.layerX, mouse.layerY);
+                this.symLayer.context.beginPath();
+                this.symLayer.context.moveTo(this.symPos.x, this.symPos.y);
+            }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
@@ -91,10 +114,23 @@
                 this.currLayer.context.strokeStyle = this.toolStrokeColorHex;
                 this.currLayer.context.lineWidth = this.toolThickness;
                 this.currLayer.context.stroke();
+
+                if (this.symHorizontal === true || this.symVertical === true) {
+                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.symLayer.context.lineCap = this.toolEnd;
+                    this.symLayer.context.strokeStyle = this.toolStrokeColorHex;
+                    this.symLayer.context.lineWidth = this.toolThickness;
+                    this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
+                    this.symLayer.context.stroke();
+                }
             }
         },
         handleMouseUp: function () {
             this.click1 = false;
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);
+                this.symLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+            }
         }
     };
     tools.eraser = {
@@ -102,6 +138,23 @@
             this.click1 = true;
             this.currLayer.context.beginPath();
             this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
+
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.calculateSymPos(mouse.layerX, mouse.layerY);
+                this.symLayer.context.beginPath();
+                this.symLayer.context.moveTo(this.symPos.x, this.symPos.y);
+                this.tmpLayer.context.drawImage(this.currLayer.canvas, 0, 0);
+                if (this.symHorizontal === true) {
+                    this.symLayer.context.drawImage(this.currLayer.canvas, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight);
+                    this.currLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                    this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0, this.contextWidth / 2, this.contextHeight, 0, 0, this.contextWidth / 2, this.contextHeight);
+                } else if (this.symVertical === true) {
+                    this.symLayer.context.drawImage(this.currLayer.canvas, 0, this.contextHeight / 2, this.contextWidth, this.contextHeight / 2, 0, this.contextHeight / 2, this.contextWidth, this.contextHeight / 2);
+                    this.currLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                    this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0, this.contextWidth, this.contextHeight / 2, 0, 0, this.contextWidth, this.contextHeight / 2);
+                }
+                this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+            }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
@@ -114,11 +167,25 @@
                 this.currLayer.context.strokeStyle = this.toolStrokeColorHex;
                 this.currLayer.context.lineWidth = this.toolThickness;
                 this.currLayer.context.stroke();
+                if (this.symHorizontal === true || this.symVertical === true) {
+                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.symLayer.context.globalCompositeOperation = "destination-out";
+                    this.symLayer.context.lineCap = this.toolEnd;
+                    this.symLayer.context.strokeStyle = this.toolStrokeColorHex;
+                    this.symLayer.context.lineWidth = this.toolThickness;
+                    this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
+                    this.symLayer.context.stroke();
+                }
             }
         },
         handleMouseUp: function () {
             this.click1 = false;
             this.currLayer.context.globalCompositeOperation = "source-over";
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.symLayer.context.globalCompositeOperation = "source-over";
+                this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);
+                this.symLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+            }
         }
     };
     tools.rectangle = {
@@ -194,7 +261,6 @@
             this.click1 = false;
             this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0);
             this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
-
         }
     };
     tools.line = {
