@@ -144,6 +144,7 @@
                 this.symLayer.context.beginPath();
                 this.symLayer.context.moveTo(this.symPos.x, this.symPos.y);
                 this.tmpLayer.context.drawImage(this.currLayer.canvas, 0, 0);
+
                 if (this.symHorizontal === true) {
                     this.symLayer.context.drawImage(this.currLayer.canvas, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight);
                     this.currLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
@@ -167,6 +168,7 @@
                 this.currLayer.context.strokeStyle = this.toolStrokeColorHex;
                 this.currLayer.context.lineWidth = this.toolThickness;
                 this.currLayer.context.stroke();
+
                 if (this.symHorizontal === true || this.symVertical === true) {
                     this.calculateSymPos(mouse.layerX, mouse.layerY);
                     this.symLayer.context.globalCompositeOperation = "destination-out";
@@ -181,6 +183,7 @@
         handleMouseUp: function () {
             this.click1 = false;
             this.currLayer.context.globalCompositeOperation = "source-over";
+
             if (this.symHorizontal === true || this.symVertical === true) {
                 this.symLayer.context.globalCompositeOperation = "source-over";
                 this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);

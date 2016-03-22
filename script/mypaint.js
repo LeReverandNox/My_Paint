@@ -277,14 +277,14 @@
             });
             $canva.appendTo($holder);
 
-            var canva = document.querySelector("#layer-" + nextLayer);
-            var context = canva.getContext("2d");
+            var canvas = document.querySelector("#layer-" + nextLayer);
+            var context = canvas.getContext("2d");
 
             context.canvas.width = this.canvasSize.width;
             context.canvas.height = this.canvasSize.height;
 
             layer.id = nextLayer;
-            layer.canva = canva;
+            layer.canvas = canvas;
             layer.context = context;
             layer.hidden = false;
             layer.active = false;
