@@ -104,6 +104,7 @@
             document.querySelector(".big-canvas-holder").addEventListener("dragover", this.preventDrag);
             document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
             document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
+            document.querySelector(".download-holder").addEventListener("click", this.exportImgPngJpeg.bind(this));
         },
         preventDrag: function (event) {
             event.preventDefault();
@@ -129,6 +130,42 @@
                 self.resizeCanvas(img.width, img.height);
                 Tool.currentContext.drawImage(img, 0, 0);
             };
+        },
+        exportImgPngJpeg: function (event) {
+            var self = this;
+            // Si on choisi de dl en jpeg, on rempli d'abord le canvas temporaire de blanc, sinon la transparence rend noire
+            if (event.target.className === "download-jpeg") {
+                this.tmp.context.fillStyle = "#ffffff";
+                this.tmp.context.fillRect(0, 0, this.tmp.canvas.width, this.tmp.canvas.height);
+            }
+
+            // On merge le canvas background sur le canvas tmp
+            if (this.background.hidden === false) {
+                this.tmp.context.drawImage(this.background.canvas, 0, 0);
+            }
+
+            // On copie le contenue de this.layers, on le trie par ordre d'affichage, on foreach dessus. Pour chaque layer visible, on le merge avec le canvas tmp
+            var layersForMerge = Object.create(this.layers);
+            layersForMerge.sort(this.comparator);
+            layersForMerge.forEach(function (layer) {
+                if (layer.hidden === false) {
+                    self.tmp.context.drawImage(layer.canva, 0, 0);
+                }
+            });
+
+            // On creer le lien du fichier, avec le bon type et on click dessus.
+            var link = document.createElement('a');
+            if (event.target.className === "download-png") {
+                link.download = "my_paint.png";
+                link.href = this.tmp.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            } else {
+                link.download = "my_paint.jpeg";
+                link.href = this.tmp.canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
+            }
+            link.click();
+
+            // On clear le canvas tmp.
+            this.tmp.context.clearRect(0, 0, this.tmp.canvas.width, this.tmp.canvas.height);
         },
         onMouseDown: function (mouse) {
             this.currentTool.handleMouseDown(mouse);
