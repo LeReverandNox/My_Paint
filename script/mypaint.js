@@ -34,7 +34,7 @@
             Tool.symLayer.canvas = document.querySelector("#canvas-sym");
             Tool.symLayer.context = Tool.symLayer.canvas.getContext("2d");
 
-            Tool.currLayer.canvas = this.background.cavas;
+            Tool.currLayer.canvas = this.background.canvas;
             Tool.currLayer.context = this.background.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
@@ -65,12 +65,16 @@
             this.background.context.canvas.height = this.canvasSize.height;
             Tool.tmpLayer.context.canvas.width = this.canvasSize.width;
             Tool.tmpLayer.context.canvas.height = this.canvasSize.height;
+            Tool.symLayer.context.canvas.width = this.canvasSize.width;
+            Tool.symLayer.context.canvas.height = this.canvasSize.height;
 
             // Ainsi que sa taille visuelle
             this.background.canvas.style.width = this.canvasSize.width + "px";
             this.background.canvas.style.height = this.canvasSize.height + "px";
             Tool.tmpLayer.canvas.style.width = this.canvasSize.width + "px";
             Tool.tmpLayer.canvas.style.height = this.canvasSize.height + "px";
+            Tool.symLayer.canvas.style.width = this.canvasSize.width + "px";
+            Tool.symLayer.canvas.style.height = this.canvasSize.height + "px";
 
             // On assigne ces dimensions aux values des inputs
             this.inputWidth.value = this.canvasSize.width;
@@ -440,34 +444,29 @@
             this.updateLayersList();
         },
         activateBackground: function () {
-            var $tmpCanvas = $(Tool.tmpLayer.canvas);
-
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
             });
             this.background.active = true;
-            $tmpCanvas.css({"z-index": 0});
+
+            this.updateTmpSymZindex(0);
 
             Tool.currLayer.canvas = this.background.canvas;
             Tool.currLayer.context = this.background.context;
         },
         activateLayer: function (layer) {
-            var $tmpCanvas = $(Tool.tmpLayer.canvas);
-
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
             });
             this.background.active = false;
 
             layer.active = true;
-            $tmpCanvas.css({"z-index": layer.order});
+            this.updateTmpSymZindex(layer.order);
 
             Tool.currLayer.canvas = layer.canvas;
             Tool.currLayer.context = layer.context;
         },
         verifyCurrentLayer: function (layer) {
-            var $tmpCanvas = $(Tool.tmpLayer.canvas);
-
             var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
             layersForDisplay.sort(this.comparator);
             var lastLayer = layersForDisplay.length >= 1
@@ -479,13 +478,13 @@
                     this.background.active = true;
                     Tool.currLayer.canvas = this.background.canvas;
                     Tool.currLayer.context = this.background.context;
-                    $tmpCanvas.css({"z-index": 0});
+                    this.updateTmpSymZindex(0);
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
                     layerToActivate.active = true;
                     Tool.currLayer.canvas = layerToActivate.canvas;
                     Tool.currLayer.context = layerToActivate.context;
-                    $tmpCanvas.css({"z-index": layerToActivate.order});
+                    this.updateTmpSymZindex(layerToActivate.order);
                 }
             }
         },
@@ -511,6 +510,13 @@
 
             $layer.css({"z-index": layer.order});
             $previousLayer.css({"z-index": previousLayer.order});
+
+            if (layer.active === true) {
+                this.updateTmpSymZindex(layer.order);
+            }
+            if (previousLayer.active === true) {
+                this.updateTmpSymZindex(previousLayer.order);
+            }
         },
         moveLayerDown: function (layer, $layer) {
             if (layer.order === this.layers.length) {
@@ -525,6 +531,20 @@
 
             $layer.css({"z-index": layer.order});
             $nextLayer.css({"z-index": nextLayer.order});
+
+            if (layer.active === true) {
+                this.updateTmpSymZindex(layer.order);
+            }
+            if (nextLayer.active === true) {
+                this.updateTmpSymZindex(nextLayer);
+            }
+        },
+        updateTmpSymZindex: function (index) {
+            var $tmpCanvas = $(Tool.tmpLayer.canvas);
+            var $symCanvas = $(Tool.symLayer.canvas);
+            $tmpCanvas.css({"z-index": index});
+            $symCanvas.css({"z-index": index});
+
         },
         grepOne: function (where, attr, value) {
             var res = $.grep(where, function (e) {

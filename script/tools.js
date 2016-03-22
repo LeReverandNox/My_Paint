@@ -23,8 +23,8 @@
             context: null
         },
         symLayer: {
-            context: null,
-            canvas: null
+            canvas: null,
+            context: null
         },
         contextWidth: null,
         contextHeight: null,
