@@ -80,7 +80,7 @@ h1 {
 }
 #canvas-base {
 }
-#canvas-base, #canvas-tmp, .canvas-layer{
+#canvas-base, #canvas-tmp, #canvas-sym, .canvas-layer{
     position: absolute;
 }
 .hidden {

@@ -14,10 +14,6 @@
             hidden: false,
             active: true
         },
-        tmp: {
-            canvas: null,
-            context: null
-        },
         canvasSize: {
             width: 640,
             height: 480
@@ -32,15 +28,14 @@
             this.background.canvas = document.querySelector("#canvas-base");
             this.background.context = this.background.canvas.getContext("2d");
 
-            this.tmp.canvas = document.querySelector("#canvas-tmp");
-            this.tmp.context = this.tmp.canvas.getContext("2d");
+            Tool.tmpLayer.canvas = document.querySelector("#canvas-tmp");
+            Tool.tmpLayer.context = Tool.tmpLayer.canvas.getContext("2d");
 
+            Tool.symLayer.canvas = document.querySelector("#canvas-sym");
+            Tool.symLayer.context = Tool.symLayer.canvas.getContext("2d");
 
-            Tool.currentCanvas = this.background.cavas;
-            Tool.currentContext = this.background.context;
-
-            Tool.tmpCanvas = this.tmp.canvas;
-            Tool.tmpContext = this.tmp.context;
+            Tool.currLayer.canvas = this.background.cavas;
+            Tool.currLayer.context = this.background.context;
 
             this.inputWidth = document.querySelector("#canvas-width");
             this.inputHeight = document.querySelector("#canvas-height");
@@ -68,14 +63,14 @@
             // On définit la taille interne du canvas
             this.background.context.canvas.width = this.canvasSize.width;
             this.background.context.canvas.height = this.canvasSize.height;
-            this.tmp.context.canvas.width = this.canvasSize.width;
-            this.tmp.context.canvas.height = this.canvasSize.height;
+            Tool.tmpLayer.context.canvas.width = this.canvasSize.width;
+            Tool.tmpLayer.context.canvas.height = this.canvasSize.height;
 
             // Ainsi que sa taille visuelle
             this.background.canvas.style.width = this.canvasSize.width + "px";
             this.background.canvas.style.height = this.canvasSize.height + "px";
-            this.tmp.canvas.style.width = this.canvasSize.width + "px";
-            this.tmp.canvas.style.height = this.canvasSize.height + "px";
+            Tool.tmpLayer.canvas.style.width = this.canvasSize.width + "px";
+            Tool.tmpLayer.canvas.style.height = this.canvasSize.height + "px";
 
             // On assigne ces dimensions aux values des inputs
             this.inputWidth.value = this.canvasSize.width;
@@ -96,6 +91,7 @@
             document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
             document.querySelector("#tools-holder").addEventListener("click", this.setCurrentTool.bind(this));
+            document.querySelector("#tool-symetrie").addEventListener("click", this.setSymetrie.bind(this));
 
             document.querySelector(".big-canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
             document.querySelector(".big-canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -105,6 +101,20 @@
             document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
             document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
             document.querySelector(".download-holder").addEventListener("click", this.exportImgPngJpeg.bind(this));
+        },
+        setSymetrie: function (event) {
+            switch (event.target.className) {
+            case "sym-h":
+                Tool.symHorizontal = Tool.symHorizontal === true
+                    ? false
+                    : true;
+                break;
+            case "sym-v":
+                Tool.symVertical = Tool.symVertical === true
+                    ? false
+                    : true;
+                break;
+            }
         },
         preventDrag: function (event) {
             event.preventDefault();
@@ -118,7 +128,7 @@
             img.onload = function () {
                 var x = event.layerX - (img.width / 2);
                 var y = event.layerY - (img.height / 2);
-                Tool.currentContext.drawImage(img, x, y);
+                Tool.currLayer.context.drawImage(img, x, y);
             };
         },
         uploadImage: function (event) {
@@ -128,20 +138,19 @@
             img.src = URL.createObjectURL(file);
             img.onload = function () {
                 self.resizeCanvas(img.width, img.height);
-                Tool.currentContext.drawImage(img, 0, 0);
+                Tool.currLayer.context.drawImage(img, 0, 0);
             };
         },
         exportImgPngJpeg: function (event) {
-            var self = this;
             // Si on choisi de dl en jpeg, on rempli d'abord le canvas temporaire de blanc, sinon la transparence rend noire
             if (event.target.className === "download-jpeg") {
-                this.tmp.context.fillStyle = "#ffffff";
-                this.tmp.context.fillRect(0, 0, this.tmp.canvas.width, this.tmp.canvas.height);
+                Tool.tmpLayer.context.fillStyle = "#ffffff";
+                Tool.tmpLayer.context.fillRect(0, 0, Tool.tmpLayer.canvas.width, Tool.tmpLayer.canvas.height);
             }
 
             // On merge le canvas background sur le canvas tmp
             if (this.background.hidden === false) {
-                this.tmp.context.drawImage(this.background.canvas, 0, 0);
+                Tool.tmpLayer.context.drawImage(this.background.canvas, 0, 0);
             }
 
             // On copie le contenue de this.layers, on le trie par ordre d'affichage, on foreach dessus. Pour chaque layer visible, on le merge avec le canvas tmp
@@ -149,7 +158,7 @@
             layersForMerge.sort(this.comparator);
             layersForMerge.forEach(function (layer) {
                 if (layer.hidden === false) {
-                    self.tmp.context.drawImage(layer.canva, 0, 0);
+                    Tool.tmpLayer.context.drawImage(layer.canva, 0, 0);
                 }
             });
 
@@ -157,15 +166,15 @@
             var link = document.createElement('a');
             if (event.target.className === "download-png") {
                 link.download = "my_paint.png";
-                link.href = this.tmp.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                link.href = Tool.tmpLayer.canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
             } else {
                 link.download = "my_paint.jpeg";
-                link.href = this.tmp.canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
+                link.href = Tool.tmpLayer.canvas.toDataURL("image/jpeg").replace("image/jpeg", "image/octet-stream");
             }
             link.click();
 
             // On clear le canvas tmp.
-            this.tmp.context.clearRect(0, 0, this.tmp.canvas.width, this.tmp.canvas.height);
+            Tool.tmpLayer.context.clearRect(0, 0, Tool.tmpLayer.canvas.width, Tool.tmpLayer.canvas.height);
         },
         onMouseDown: function (mouse) {
             this.currentTool.handleMouseDown(mouse);
@@ -362,7 +371,7 @@
 
             while (true === again) {
                 if (undefined === this.layers[i] || this.layers[i].hidden === false) {
-                    Tool.currentContext = i;
+                    Tool.currLayer.context = i;
                     again = false;
                 }
                 i -= 1;
@@ -431,7 +440,7 @@
             this.updateLayersList();
         },
         activateBackground: function () {
-            var $tmpCanvas = $(this.tmp.canvas);
+            var $tmpCanvas = $(Tool.tmpLayer.canvas);
 
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
@@ -439,11 +448,11 @@
             this.background.active = true;
             $tmpCanvas.css({"z-index": 0});
 
-            Tool.currentCanvas = this.background.canvas;
-            Tool.currentContext = this.background.context;
+            Tool.currLayer.canvas = this.background.canvas;
+            Tool.currLayer.context = this.background.context;
         },
         activateLayer: function (layer) {
-            var $tmpCanvas = $(this.tmp.canvas);
+            var $tmpCanvas = $(Tool.tmpLayer.canvas);
 
             this.layers.forEach(function (otherLayer) {
                 otherLayer.active = false;
@@ -453,11 +462,11 @@
             layer.active = true;
             $tmpCanvas.css({"z-index": layer.order});
 
-            Tool.currentCanvas = layer.canvas;
-            Tool.currentContext = layer.context;
+            Tool.currLayer.canvas = layer.canvas;
+            Tool.currLayer.context = layer.context;
         },
         verifyCurrentLayer: function (layer) {
-            var $tmpCanvas = $(this.tmp.canvas);
+            var $tmpCanvas = $(Tool.tmpLayer.canvas);
 
             var layersForDisplay = JSON.parse(JSON.stringify(this.layers));
             layersForDisplay.sort(this.comparator);
@@ -468,14 +477,14 @@
             if (layer.active === true) {
                 if (lastLayer === null) {
                     this.background.active = true;
-                    Tool.currentCanvas = this.background.canvas;
-                    Tool.currentContext = this.background.context;
+                    Tool.currLayer.canvas = this.background.canvas;
+                    Tool.currLayer.context = this.background.context;
                     $tmpCanvas.css({"z-index": 0});
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
                     layerToActivate.active = true;
-                    Tool.currentCanvas = layerToActivate.canvas;
-                    Tool.currentContext = layerToActivate.context;
+                    Tool.currLayer.canvas = layerToActivate.canvas;
+                    Tool.currLayer.context = layerToActivate.context;
                     $tmpCanvas.css({"z-index": layerToActivate.order});
                 }
             }
