@@ -63,6 +63,14 @@
             x: null,
             y: null
         },
+        originSym: {
+            x: null,
+            y: null
+        },
+        destinationSym: {
+            x: null,
+            y: null
+        },
         symHorizontal: false,
         symVertical: false,
         symPos: {
@@ -81,6 +89,29 @@
                 this.symPos.x = x;
                 this.symPos.y = this.contextHeight - y;
             }
+        },
+        calculateSymOrigin: function (x, y) {
+            this.calculateSymPos(x, y);
+            this.originSym.x = this.symPos.x;
+            this.originSym.y = this.symPos.y;
+        },
+        drawSymetrie: function () {
+            this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);
+            this.clearContext(this.symLayer.context);
+        },
+        draw: function () {
+            this.click1 = false;
+            this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0);
+            this.clearContext(this.tmpLayer.context);
+        },
+        setContextOptions: function (context) {
+            context.lineCap = this.toolEnd;
+            context.strokeStyle = this.toolStrokeColorHex;
+            context.fillStyle = this.toolFillColorHex;
+            context.lineWidth = this.toolThickness;
+        },
+        clearContext: function (context) {
+            context.clearRect(0, 0, this.contextWidth, this.contextHeight);
         }
     };
 
@@ -92,12 +123,14 @@
             return newTool;
         }
     };
+
     tools.pencil = {
         handleMouseDown: function (mouse) {
             this.click1 = true;
             this.currLayer.context.beginPath();
             this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
 
+            // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
                 this.calculateSymPos(mouse.layerX, mouse.layerY);
                 this.symLayer.context.beginPath();
@@ -109,17 +142,14 @@
                 this.destination.x = mouse.layerX;
                 this.destination.y = mouse.layerY;
 
-                this.currLayer.context.lineCap = this.toolEnd;
+                this.setContextOptions(this.currLayer.context);
                 this.currLayer.context.lineTo(this.destination.x, this.destination.y);
-                this.currLayer.context.strokeStyle = this.toolStrokeColorHex;
-                this.currLayer.context.lineWidth = this.toolThickness;
                 this.currLayer.context.stroke();
 
+                // Symétrie
                 if (this.symHorizontal === true || this.symVertical === true) {
                     this.calculateSymPos(mouse.layerX, mouse.layerY);
-                    this.symLayer.context.lineCap = this.toolEnd;
-                    this.symLayer.context.strokeStyle = this.toolStrokeColorHex;
-                    this.symLayer.context.lineWidth = this.toolThickness;
+                    this.setContextOptions(this.symLayer.context);
                     this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
                     this.symLayer.context.stroke();
                 }
@@ -127,9 +157,10 @@
         },
         handleMouseUp: function () {
             this.click1 = false;
+
+            // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);
-                this.symLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                this.drawSymetrie();
             }
         }
     };
@@ -139,6 +170,7 @@
             this.currLayer.context.beginPath();
             this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
 
+            // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
                 this.calculateSymPos(mouse.layerX, mouse.layerY);
                 this.symLayer.context.beginPath();
@@ -147,34 +179,28 @@
 
                 if (this.symHorizontal === true) {
                     this.symLayer.context.drawImage(this.currLayer.canvas, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight, this.contextWidth / 2, 0, this.contextWidth / 2, this.contextHeight);
-                    this.currLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                    this.clearContext(this.currLayer.context);
                     this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0, this.contextWidth / 2, this.contextHeight, 0, 0, this.contextWidth / 2, this.contextHeight);
                 } else if (this.symVertical === true) {
                     this.symLayer.context.drawImage(this.currLayer.canvas, 0, this.contextHeight / 2, this.contextWidth, this.contextHeight / 2, 0, this.contextHeight / 2, this.contextWidth, this.contextHeight / 2);
-                    this.currLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                    this.clearContext(this.currLayer.context);
                     this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0, this.contextWidth, this.contextHeight / 2, 0, 0, this.contextWidth, this.contextHeight / 2);
                 }
-                this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                this.clearContext(this.tmpLayer.context);
             }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
-                this.destination.x = mouse.layerX;
-                this.destination.y = mouse.layerY;
-
                 this.currLayer.context.globalCompositeOperation = "destination-out";
-                this.currLayer.context.lineCap = this.toolEnd;
-                this.currLayer.context.lineTo(this.destination.x, this.destination.y);
-                this.currLayer.context.strokeStyle = this.toolStrokeColorHex;
-                this.currLayer.context.lineWidth = this.toolThickness;
+                this.setContextOptions(this.currLayer.context);
+                this.currLayer.context.lineTo(mouse.layerX, mouse.layerY);
                 this.currLayer.context.stroke();
 
+                // Symétrie
                 if (this.symHorizontal === true || this.symVertical === true) {
                     this.calculateSymPos(mouse.layerX, mouse.layerY);
                     this.symLayer.context.globalCompositeOperation = "destination-out";
-                    this.symLayer.context.lineCap = this.toolEnd;
-                    this.symLayer.context.strokeStyle = this.toolStrokeColorHex;
-                    this.symLayer.context.lineWidth = this.toolThickness;
+                    this.setContextOptions(this.symLayer.context);
                     this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
                     this.symLayer.context.stroke();
                 }
@@ -184,10 +210,10 @@
             this.click1 = false;
             this.currLayer.context.globalCompositeOperation = "source-over";
 
+            // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
                 this.symLayer.context.globalCompositeOperation = "source-over";
-                this.currLayer.context.drawImage(this.symLayer.canvas, 0, 0);
-                this.symLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                this.drawSymetrie();
             }
         }
     };
@@ -196,37 +222,59 @@
             this.click1 = true;
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
+
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+            }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
 
-                this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                this.clearContext(this.tmpLayer.context);
 
                 var dist = {
                     x: mouse.layerX - this.origin.x,
                     y: mouse.layerY - this.origin.y
                 };
 
-
-                this.tmpLayer.context.lineCap = this.toolEnd;
-                this.tmpLayer.context.strokeStyle = this.toolStrokeColorHex;
-                this.tmpLayer.context.lineWidth = this.toolThickness;
+                this.setContextOptions(this.tmpLayer.context);
 
                 this.tmpLayer.context.rect(this.origin.x, this.origin.y, dist.x, dist.y);
                 if (this.toolFill === true) {
-                    this.tmpLayer.context.fillStyle = this.toolFillColorHex;
                     this.tmpLayer.context.fill();
                 }
                 this.tmpLayer.context.stroke();
                 this.tmpLayer.context.closePath();
+
+                // Symétrie
+                if (this.symHorizontal === true || this.symVertical === true) {
+                    this.symLayer.context.beginPath();
+                    this.clearContext(this.symLayer.context);
+
+                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    dist.x = this.symPos.x - this.originSym.x;
+                    dist.y = this.symPos.y - this.originSym.y;
+
+                    this.setContextOptions(this.symLayer.context);
+
+                    this.symLayer.context.rect(this.originSym.x, this.originSym.y, dist.x, dist.y);
+                    if (this.toolFill === true) {
+                        this.symLayer.context.fill();
+                    }
+
+                    this.symLayer.context.stroke();
+                    this.symLayer.context.closePath();
+                }
             }
         },
         handleMouseUp: function () {
-            this.click1 = false;
-            this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0);
-            this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
-
+            this.draw();
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.drawSymetrie();
+            }
         }
     };
     tools.circle = {
@@ -234,12 +282,17 @@
             this.click1 = true;
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
+
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+            }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
 
-                this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+                this.clearContext(this.tmpLayer.context);
 
                 var dist = {
                     x: mouse.layerX - this.origin.x,
@@ -247,23 +300,43 @@
                 };
                 var radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
 
-                this.tmpLayer.context.lineCap = this.toolEnd;
-                this.tmpLayer.context.strokeStyle = this.toolStrokeColorHex;
-                this.tmpLayer.context.lineWidth = this.toolThickness;
+                this.setContextOptions(this.tmpLayer.context);
                 this.tmpLayer.context.arc(this.origin.x, this.origin.y, radius, 0, Math.PI * 2);
 
                 if (this.toolFill === true) {
-                    this.tmpLayer.context.fillStyle = this.toolFillColorHex;
                     this.tmpLayer.context.fill();
                 }
                 this.tmpLayer.context.stroke();
                 this.tmpLayer.context.closePath();
+
+                // Symétrie
+                if (this.symHorizontal === true || this.symVertical === true) {
+                    this.symLayer.context.beginPath();
+                    this.clearContext(this.symLayer.context);
+
+                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    dist.x = this.symPos.x - this.originSym.x;
+                    dist.y = this.symPos.y - this.originSym.y;
+                    radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
+
+
+                    this.setContextOptions(this.symLayer.context);
+                    this.symLayer.context.arc(this.originSym.x, this.originSym.y, radius, 0, Math.PI * 2);
+                    if (this.toolFill === true) {
+                        this.symLayer.context.fill();
+                    }
+
+                    this.symLayer.context.stroke();
+                    this.symLayer.context.closePath();
+                }
             }
         },
         handleMouseUp: function () {
-            this.click1 = false;
-            this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0);
-            this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+            this.draw();
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.drawSymetrie();
+            }
         }
     };
     tools.line = {
@@ -272,31 +345,45 @@
             this.origin.x = mouse.layerX;
             this.origin.y = mouse.layerY;
 
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+            }
         },
         handleMouseMove: function (mouse) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
-
                 this.tmpLayer.context.moveTo(this.origin.x, this.origin.y);
+                this.clearContext(this.tmpLayer.context);
 
-                this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
-
-                this.tmpLayer.context.lineCap = this.toolEnd;
-                this.tmpLayer.context.strokeStyle = this.toolStrokeColorHex;
-                this.tmpLayer.context.lineWidth = this.toolThickness;
+                this.setContextOptions(this.tmpLayer.context);
 
                 this.tmpLayer.context.lineTo(mouse.layerX, mouse.layerY);
-
                 this.tmpLayer.context.stroke();
-                this.tmpLayer.context.fill();
-
                 this.tmpLayer.context.closePath();
+
+                // Symétrie
+                if (this.symHorizontal === true || this.symVertical === true) {
+                    this.symLayer.context.beginPath();
+                    this.symLayer.context.moveTo(this.originSym.x, this.originSym.y);
+                    this.clearContext(this.symLayer.context);
+
+                    this.setContextOptions(this.symLayer.context);
+
+                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
+                    this.symLayer.context.stroke();
+                    this.symLayer.context.closePath();
+                }
+
             }
         },
         handleMouseUp: function () {
-            this.click1 = false;
-            this.currLayer.context.drawImage(this.tmpLayer.canvas, 0, 0);
-            this.tmpLayer.context.clearRect(0, 0, this.contextWidth, this.contextHeight);
+            this.draw();
+            // Symétrie
+            if (this.symHorizontal === true || this.symVertical === true) {
+                this.drawSymetrie();
+            }
         }
     };
     tools.eyedropper = {
