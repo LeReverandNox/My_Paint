@@ -109,6 +109,9 @@
                 case "resizeCanvas":
                     self.resizeCanvas(obj.width, obj.height);
                     break;
+                case "dropImage":
+                    self.dropImageFromClient(obj.src, obj.x, obj.y);
+                    break;
                 case "addLayer":
                     self.addLayer();
                     break;
@@ -188,8 +191,25 @@
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
         },
+        sendDroppedImage: function (src, x, y) {
+            var obj = {
+                event: "dropImage",
+                src: src,
+                x: x,
+                y: y
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
         send: function (json) {
             this.websocket.send(json);
+        },
+        dropImageFromClient: function (src, x, y) {
+            var img = new Image();
+            img.src = src;
+            img.onload = function () {
+                Tool.currLayer.context.drawImage(img, x, y);
+            };
         },
         init: function () {
             this.background.canvas = document.querySelector("#canvas-base");
@@ -317,6 +337,7 @@
         },
         importOnDrop: function (event) {
             event.preventDefault();
+            var self = this;
             var dt = event.dataTransfer;
             var file = dt.files[0];
             var img = new Image();
@@ -325,6 +346,10 @@
                 var x = event.layerX - (img.width / 2);
                 var y = event.layerY - (img.height / 2);
                 Tool.currLayer.context.drawImage(img, x, y);
+
+                if (self.online === true) {
+                    self.sendDroppedImage(img.src, x, y);
+                }
             };
         },
         uploadImage: function (event) {
