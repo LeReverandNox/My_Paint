@@ -15,6 +15,7 @@
 
             this.wss.on("connection", this.handleConnection.bind(this));
         },
+
         handleConnection: function (socket) {
             var self = this;
             this.sockets.push(socket);

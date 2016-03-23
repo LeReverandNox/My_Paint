@@ -126,8 +126,6 @@
 
     tools.pencil = {
         handleMouseDown: function (coords) {
-            // console.log("Le client clique " + [coords.x, coords.y]);
-            console.log(this.currLayer);
             this.click1 = true;
             this.currLayer.context.beginPath();
             this.currLayer.context.moveTo(coords.x, coords.y);
@@ -140,7 +138,6 @@
             }
         },
         handleMouseMove: function (coords) {
-            // console.log("Le client move " + coords);
             if (this.click1 === true) {
                 this.destination.x = coords.x;
                 this.destination.y = coords.y;
@@ -159,7 +156,6 @@
             }
         },
         handleMouseUp: function () {
-            // console.log("Le client relache");
             this.click1 = false;
 
             // Symétrie

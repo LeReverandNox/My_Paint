@@ -33,7 +33,7 @@
             var self = this;
             var server = "ws://10.34.1.222:8080";
             this.websocket = new WebSocket(server);
-            this.websocket.onopen = function (e) {
+            this.websocket.onopen = function () {
                 self.websocket.onmessage = function (e) {
                     self.handleSocketMessage(e, self);
                 };
@@ -44,9 +44,7 @@
             var possible = "0123456789";
             var i;
             for (i = 0; i < 5; i += 1) {
-
                 text += possible.charAt(Math.floor(Math.random() * possible.length));
-
             }
             return text;
         },
@@ -112,7 +110,9 @@
                 toolEnd: this.currentTool.toolEnd,
                 toolFill: this.currentTool.toolFill,
                 toolStrokeColorHex: this.currentTool.toolStrokeColorHex,
-                toolFillColorHex: this.currentTool.toolFillColorHex
+                toolFillColorHex: this.currentTool.toolFillColorHex,
+                symHorizontal: this.currentTool.symHorizontal,
+                symVertical: this.currentTool.symVertical
             };
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
