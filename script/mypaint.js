@@ -46,7 +46,6 @@
                 if (self.websocket.readyState === 0) {
                     self.online = false;
                     alert("Echec de la connection");
-                    return false;
                 } else {
                     self.online = true;
                     alert("Vous êtes maintenant en ligne !");
@@ -86,17 +85,28 @@
                     client.tool = socketTool;
                 }
             }
-
+            var self = this;
             setTimeout(function () {
                 client = context.findSocketByToken(obj.token);
-                if (obj.event === "mousedown") {
+                switch (obj.event) {
+                case "mousedown":
                     client.tool.handleMouseDown(obj);
-                }
-                if (obj.event === "mousemove") {
+                    break;
+                case "mousemove":
                     client.tool.handleMouseMove(obj);
-                }
-                if (obj.event === "mouseup") {
+                    break;
+                case "mouseup":
                     client.tool.handleMouseUp(obj);
+                    break;
+                case "resetCanvas":
+                    self.resetCanvas();
+                    break;
+                case "resetSizeCanvas":
+                    self.resetSizeCanvas();
+                    break;
+                case "resizeCanvas":
+                    self.resizeCanvas(obj.width, obj.height);
+                    break;
                 }
             }, 10);
         },
@@ -139,6 +149,29 @@
                 toolFillColorHex: this.currentTool.toolFillColorHex,
                 symHorizontal: this.currentTool.symHorizontal,
                 symVertical: this.currentTool.symVertical
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        sendResetCanvasEvent: function () {
+            var obj = {
+                event: "resetCanvas"
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        sendResizeEvent: function () {
+            var obj = {
+                event: "resizeCanvas",
+                width: this.canvasSize.width,
+                height: this.canvasSize.height
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        sendResetSizeCanvasEvent: function () {
+            var obj = {
+                event: "resetSizeCanvas"
             };
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
@@ -208,9 +241,9 @@
             this.updateLayersList();
         },
         addListeners: function () {
-            document.querySelector("#canvas-set-dimensions").addEventListener("click", this.resizeCanvas.bind(this));
-            document.querySelector("#canvas-reset").addEventListener("click", this.resetCanvas.bind(this));
-            document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.resetSizeCanvas.bind(this));
+            document.querySelector("#canvas-set-dimensions").addEventListener("click", this.handleResizeCanvas.bind(this));
+            document.querySelector("#canvas-reset").addEventListener("click", this.handleResetCanvas.bind(this));
+            document.querySelector("#canvas-reset-dimensions").addEventListener("click", this.handleResetSizeCanvas.bind(this));
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
             document.querySelector("#tool-fillness").addEventListener("click", this.setToolFillness.bind(this));
             document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
@@ -228,6 +261,24 @@
             document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
             document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
             document.querySelector(".download-holder").addEventListener("click", this.exportImgPngJpeg.bind(this));
+        },
+        handleResetCanvas: function () {
+            this.resetCanvas();
+            if (this.online === true) {
+                this.sendResetCanvasEvent();
+            }
+        },
+        handleResetSizeCanvas: function () {
+            this.resetSizeCanvas();
+            if (this.online === true) {
+                this.sendResetSizeCanvasEvent();
+            }
+        },
+        handleResizeCanvas: function () {
+            this.resizeCanvas();
+            if (this.online === true) {
+                this.sendResizeEvent();
+            }
         },
         setSymetrie: function (event) {
             switch (event.target.className) {
