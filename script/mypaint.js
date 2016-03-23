@@ -507,6 +507,7 @@
             // On remet le canvas a sa taille par défaut
             this.canvasSize.width = 640;
             this.canvasSize.height = 480;
+            this.resetCanvas();
             this.setDimensions();
         },
         resetCanvas: function () {
