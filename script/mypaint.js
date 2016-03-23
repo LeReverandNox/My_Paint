@@ -112,6 +112,9 @@
                 case "dropImage":
                     self.dropImageFromClient(obj.src, obj.x, obj.y);
                     break;
+                case "importImage":
+                    self.importImageFromClient(obj.src);
+                    break;
                 case "addLayer":
                     self.addLayer();
                     break;
@@ -201,6 +204,14 @@
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
         },
+        sendImportedImage: function (src) {
+            var obj = {
+                event: "importImage",
+                src: src
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
         send: function (json) {
             this.websocket.send(json);
         },
@@ -209,6 +220,15 @@
             img.src = src;
             img.onload = function () {
                 Tool.currLayer.context.drawImage(img, x, y);
+            };
+        },
+        importImageFromClient: function (src) {
+            var self = this;
+            var img = new Image();
+            img.src = src;
+            img.onload = function () {
+                self.resizeCanvas(img.width, img.height);
+                Tool.currLayer.context.drawImage(img, 0, 0);
             };
         },
         init: function () {
@@ -360,6 +380,10 @@
             img.onload = function () {
                 self.resizeCanvas(img.width, img.height);
                 Tool.currLayer.context.drawImage(img, 0, 0);
+
+                if (self.online === true) {
+                    self.sendImportedImage(img.src);
+                }
             };
         },
         exportImgPngJpeg: function (event) {
