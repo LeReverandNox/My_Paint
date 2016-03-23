@@ -118,6 +118,9 @@
                 case "addLayer":
                     self.addLayer();
                     break;
+                case "layerAction":
+                    self.manageLayerFromClient(obj.action, obj.num);
+                    break;
                 }
             }, 10);
         },
@@ -212,6 +215,15 @@
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
         },
+        sendLayerAction: function (name, num) {
+            var obj = {
+                event: "layerAction",
+                action: name,
+                num: num
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
         send: function (json) {
             this.websocket.send(json);
         },
@@ -230,6 +242,28 @@
                 self.resizeCanvas(img.width, img.height);
                 Tool.currLayer.context.drawImage(img, 0, 0);
             };
+        },
+        manageLayerFromClient: function (action, num) {
+            var layer = this.grepOne(this.layers, "id", num);
+            var $layer = $("#layer-" + num);
+
+            switch (action) {
+            case "activate":
+                this.activateLayer(layer);
+                break;
+            case "delete":
+                this.deleteLayer(layer, $layer);
+                break;
+            case "up":
+                this.moveLayerUp(layer, $layer);
+                break;
+            case "down":
+                this.moveLayerDown(layer, $layer);
+                break;
+            }
+
+            this.recalculateOrder();
+            this.updateLayersList();
         },
         init: function () {
             this.background.canvas = document.querySelector("#canvas-base");
@@ -673,15 +707,27 @@
                 break;
             case "layer-delete":
                 this.deleteLayer(layer, $layer);
+                if (this.online) {
+                    this.sendLayerAction("delete", num);
+                }
                 break;
             case "layer-up":
                 this.moveLayerUp(layer, $layer);
+                if (this.online) {
+                    this.sendLayerAction("up", num);
+                }
                 break;
             case "layer-down":
                 this.moveLayerDown(layer, $layer);
+                if (this.online) {
+                    this.sendLayerAction("down", num);
+                }
                 break;
             case "layer-active":
                 this.activateLayer(layer);
+                if (this.online) {
+                    this.sendLayerAction("activate", num);
+                }
                 break;
             case "background-hide":
                 this.toggleBackground();
