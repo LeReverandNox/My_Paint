@@ -1,5 +1,5 @@
 /*jslint browser this for bitwise */
-/*global alert $ Tool tools toolFactory URL */
+/*global alert $ Tool tools toolFactory URL WebSocket */
 
 (function (global) {
     "use strict";
@@ -23,8 +23,106 @@
         layers: [],
         currentTool: null,
         currentToolName: "pencil",
+        websocket: null,
+        clients: [],
+        token: null,
 
+        startSocket: function () {
+            this.token = this.makeToken();
+
+            var self = this;
+            var server = "ws://10.34.1.222:8080";
+            this.websocket = new WebSocket(server);
+            this.websocket.onopen = function (e) {
+                self.websocket.onmessage = function (e) {
+                    self.handleSocketMessage(e, self);
+                };
+            };
+        },
+        makeToken: function () {
+            var text = "";
+            var possible = "0123456789";
+            var i;
+            for (i = 0; i < 5; i += 1) {
+
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            }
+            return text;
+        },
+        handleSocketMessage: function (e, context) {
+            var obj = JSON.parse(e.data);
+            var client = context.findSocketByToken(obj.token);
+            if (obj.event === "tool") {
+                var socketTool = toolFactory.new(obj.toolName);
+                Object.assign(socketTool, obj);
+                if (client === false) {
+                    context.addClient(obj.token, socketTool);
+                } else {
+                    client.tool = socketTool;
+                }
+            }
+
+            setTimeout(function () {
+                client = context.findSocketByToken(obj.token);
+                if (obj.event === "mousedown") {
+                    client.tool.handleMouseDown(obj);
+                }
+                if (obj.event === "mousemove") {
+                    client.tool.handleMouseMove(obj);
+                }
+                if (obj.event === "mouseup") {
+                    client.tool.handleMouseUp(obj);
+                }
+            }, 10);
+        },
+        findSocketByToken: function (token) {
+            var found = false;
+            if (this.clients.length > 0) {
+                this.clients.forEach(function (client) {
+                    if (client.token === token) {
+                        found = client;
+                    }
+                });
+            }
+            return found;
+        },
+        addClient: function (token, tool) {
+            this.clients.push({
+                token: token,
+                tool: tool
+            });
+        },
+        sendMouseEvent: function (name, mouse) {
+            var obj = {
+                event: name,
+                token: this.token,
+                x: mouse.layerX,
+                y: mouse.layerY
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        sendCurrTool: function () {
+            var obj = {
+                event: "tool",
+                token: this.token,
+                toolName: this.currentToolName,
+                toolThickness: this.currentTool.toolThickness,
+                toolEnd: this.currentTool.toolEnd,
+                toolFill: this.currentTool.toolFill,
+                toolStrokeColorHex: this.currentTool.toolStrokeColorHex,
+                toolFillColorHex: this.currentTool.toolFillColorHex
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        send: function (json) {
+            this.websocket.send(json);
+        },
         init: function () {
+            this.startSocket();
+
             this.background.canvas = document.querySelector("#canvas-base");
             this.background.context = this.background.canvas.getContext("2d");
 
@@ -181,13 +279,26 @@
             Tool.tmpLayer.context.clearRect(0, 0, Tool.tmpLayer.canvas.width, Tool.tmpLayer.canvas.height);
         },
         onMouseDown: function (mouse) {
-            this.currentTool.handleMouseDown(mouse);
+            // this.currentTool.handleMouseDown(mouse);
+            this.currentTool.handleMouseDown({x: mouse.layerX, y: mouse.layerY});
+            if (this.websocket) {
+                this.sendMouseEvent("mousedown", mouse);
+                this.sendCurrTool();
+            }
         },
         onMouseMove: function (mouse) {
-            this.currentTool.handleMouseMove(mouse);
+            // this.currentTool.handleMouseMove(mouse);
+            this.currentTool.handleMouseMove({x: mouse.layerX, y: mouse.layerY});
+            if (this.websocket && this.currentTool.click1) {
+                this.sendMouseEvent("mousemove", mouse);
+            }
         },
         onMouseUp: function (mouse) {
-            this.currentTool.handleMouseUp(mouse);
+            // this.currentTool.handleMouseUp(mouse);
+            this.currentTool.handleMouseUp({x: mouse.layerX, y: mouse.layerY});
+            if (this.websocket) {
+                this.sendMouseEvent("mouseup", mouse);
+            }
         },
         setCurrentTool: function (tools) {
             this.currentToolName = tools.target.getAttribute("attr-tool");

@@ -125,22 +125,25 @@
     };
 
     tools.pencil = {
-        handleMouseDown: function (mouse) {
+        handleMouseDown: function (coords) {
+            // console.log("Le client clique " + [coords.x, coords.y]);
+            console.log(this.currLayer);
             this.click1 = true;
             this.currLayer.context.beginPath();
-            this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
+            this.currLayer.context.moveTo(coords.x, coords.y);
 
             // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.calculateSymPos(mouse.layerX, mouse.layerY);
+                this.calculateSymPos(coords.x, coords.y);
                 this.symLayer.context.beginPath();
                 this.symLayer.context.moveTo(this.symPos.x, this.symPos.y);
             }
         },
-        handleMouseMove: function (mouse) {
+        handleMouseMove: function (coords) {
+            // console.log("Le client move " + coords);
             if (this.click1 === true) {
-                this.destination.x = mouse.layerX;
-                this.destination.y = mouse.layerY;
+                this.destination.x = coords.x;
+                this.destination.y = coords.y;
 
                 this.setContextOptions(this.currLayer.context);
                 this.currLayer.context.lineTo(this.destination.x, this.destination.y);
@@ -148,7 +151,7 @@
 
                 // Symétrie
                 if (this.symHorizontal === true || this.symVertical === true) {
-                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.calculateSymPos(coords.x, coords.y);
                     this.setContextOptions(this.symLayer.context);
                     this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
                     this.symLayer.context.stroke();
@@ -156,6 +159,7 @@
             }
         },
         handleMouseUp: function () {
+            // console.log("Le client relache");
             this.click1 = false;
 
             // Symétrie
@@ -165,14 +169,14 @@
         }
     };
     tools.eraser = {
-        handleMouseDown: function (mouse) {
+        handleMouseDown: function (coords) {
             this.click1 = true;
             this.currLayer.context.beginPath();
-            this.currLayer.context.moveTo(mouse.layerX, mouse.layerY);
+            this.currLayer.context.moveTo(coords.x, coords.y);
 
             // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.calculateSymPos(mouse.layerX, mouse.layerY);
+                this.calculateSymPos(coords.x, coords.y);
                 this.symLayer.context.beginPath();
                 this.symLayer.context.moveTo(this.symPos.x, this.symPos.y);
                 this.tmpLayer.context.drawImage(this.currLayer.canvas, 0, 0);
@@ -189,16 +193,16 @@
                 this.clearContext(this.tmpLayer.context);
             }
         },
-        handleMouseMove: function (mouse) {
+        handleMouseMove: function (coords) {
             if (this.click1 === true) {
                 this.currLayer.context.globalCompositeOperation = "destination-out";
                 this.setContextOptions(this.currLayer.context);
-                this.currLayer.context.lineTo(mouse.layerX, mouse.layerY);
+                this.currLayer.context.lineTo(coords.x, coords.y);
                 this.currLayer.context.stroke();
 
                 // Symétrie
                 if (this.symHorizontal === true || this.symVertical === true) {
-                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.calculateSymPos(coords.x, coords.y);
                     this.symLayer.context.globalCompositeOperation = "destination-out";
                     this.setContextOptions(this.symLayer.context);
                     this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
@@ -218,25 +222,25 @@
         }
     };
     tools.rectangle = {
-        handleMouseDown: function (mouse) {
+        handleMouseDown: function (coords) {
             this.click1 = true;
-            this.origin.x = mouse.layerX;
-            this.origin.y = mouse.layerY;
+            this.origin.x = coords.x;
+            this.origin.y = coords.y;
 
             // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+                this.calculateSymOrigin(coords.x, coords.y);
             }
         },
-        handleMouseMove: function (mouse) {
+        handleMouseMove: function (coords) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
 
                 this.clearContext(this.tmpLayer.context);
 
                 var dist = {
-                    x: mouse.layerX - this.origin.x,
-                    y: mouse.layerY - this.origin.y
+                    x: coords.x - this.origin.x,
+                    y: coords.y - this.origin.y
                 };
 
                 this.setContextOptions(this.tmpLayer.context);
@@ -253,7 +257,7 @@
                     this.symLayer.context.beginPath();
                     this.clearContext(this.symLayer.context);
 
-                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.calculateSymPos(coords.x, coords.y);
                     dist.x = this.symPos.x - this.originSym.x;
                     dist.y = this.symPos.y - this.originSym.y;
 
@@ -278,25 +282,25 @@
         }
     };
     tools.circle = {
-        handleMouseDown: function (mouse) {
+        handleMouseDown: function (coords) {
             this.click1 = true;
-            this.origin.x = mouse.layerX;
-            this.origin.y = mouse.layerY;
+            this.origin.x = coords.x;
+            this.origin.y = coords.y;
 
             // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+                this.calculateSymOrigin(coords.x, coords.y);
             }
         },
-        handleMouseMove: function (mouse) {
+        handleMouseMove: function (coords) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
 
                 this.clearContext(this.tmpLayer.context);
 
                 var dist = {
-                    x: mouse.layerX - this.origin.x,
-                    y: mouse.layerY - this.origin.y
+                    x: coords.x - this.origin.x,
+                    y: coords.y - this.origin.y
                 };
                 var radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
 
@@ -314,7 +318,7 @@
                     this.symLayer.context.beginPath();
                     this.clearContext(this.symLayer.context);
 
-                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.calculateSymPos(coords.x, coords.y);
                     dist.x = this.symPos.x - this.originSym.x;
                     dist.y = this.symPos.y - this.originSym.y;
                     radius = Math.sqrt(Math.pow(dist.x, 2) + Math.pow(dist.y, 2));
@@ -340,17 +344,17 @@
         }
     };
     tools.line = {
-        handleMouseDown: function (mouse) {
+        handleMouseDown: function (coords) {
             this.click1 = true;
-            this.origin.x = mouse.layerX;
-            this.origin.y = mouse.layerY;
+            this.origin.x = coords.x;
+            this.origin.y = coords.y;
 
             // Symétrie
             if (this.symHorizontal === true || this.symVertical === true) {
-                this.calculateSymOrigin(mouse.layerX, mouse.layerY);
+                this.calculateSymOrigin(coords.x, coords.y);
             }
         },
-        handleMouseMove: function (mouse) {
+        handleMouseMove: function (coords) {
             if (this.click1 === true) {
                 this.tmpLayer.context.beginPath();
                 this.tmpLayer.context.moveTo(this.origin.x, this.origin.y);
@@ -358,7 +362,7 @@
 
                 this.setContextOptions(this.tmpLayer.context);
 
-                this.tmpLayer.context.lineTo(mouse.layerX, mouse.layerY);
+                this.tmpLayer.context.lineTo(coords.x, coords.y);
                 this.tmpLayer.context.stroke();
                 this.tmpLayer.context.closePath();
 
@@ -370,7 +374,7 @@
 
                     this.setContextOptions(this.symLayer.context);
 
-                    this.calculateSymPos(mouse.layerX, mouse.layerY);
+                    this.calculateSymPos(coords.x, coords.y);
                     this.symLayer.context.lineTo(this.symPos.x, this.symPos.y);
                     this.symLayer.context.stroke();
                     this.symLayer.context.closePath();
@@ -387,9 +391,9 @@
         }
     };
     tools.eyedropper = {
-        handleMouseDown: function (mouse) {
-            this.origin.x = mouse.layerX;
-            this.origin.y = mouse.layerY;
+        handleMouseDown: function (coords) {
+            this.origin.x = coords.x;
+            this.origin.y = coords.y;
 
             var arrRgb = this.currLayer.context.getImageData(this.origin.x, this.origin.y, 1, 1).data;
             var rgb = {

@@ -13,12 +13,21 @@
             this.wss = new WebSocketServer(this.infos);
             console.log("Le sever est lancé sur le port " + this.infos.port);
 
-            this.handleConnection();
+            this.wss.on("connection", this.handleConnection.bind(this));
         },
-        handleConnection: function () {
-            this.wss.on("connection", function (socket) {
-                this.sockets.push(socket);
-                console.log(this.sockets);
+        handleConnection: function (socket) {
+            var self = this;
+            this.sockets.push(socket);
+
+            socket.on("message", function (msg) {
+                self.broacast(msg, socket);
+            });
+        },
+        broacast: function (msg, origin) {
+            this.wss.clients.forEach(function (client) {
+                if (client._ultron.id !== origin._ultron.id) {
+                    client.send(msg);
+                }
             });
         }
     };
