@@ -81,6 +81,8 @@
                 Object.assign(socketTool, obj);
                 if (client === false) {
                     context.addClient(obj.token, socketTool);
+                    this.sendResetSizeCanvasEvent();
+                    this.resetSizeCanvas();
                 } else {
                     client.tool = socketTool;
                 }
@@ -106,6 +108,9 @@
                     break;
                 case "resizeCanvas":
                     self.resizeCanvas(obj.width, obj.height);
+                    break;
+                case "addLayer":
+                    self.addLayer();
                     break;
                 }
             }, 10);
@@ -172,6 +177,13 @@
         sendResetSizeCanvasEvent: function () {
             var obj = {
                 event: "resetSizeCanvas"
+            };
+            var strEvent = JSON.stringify(obj);
+            this.websocket.send(strEvent);
+        },
+        sendAddLayer: function () {
+            var obj = {
+                event: "addLayer"
             };
             var strEvent = JSON.stringify(obj);
             this.websocket.send(strEvent);
@@ -247,7 +259,7 @@
             document.querySelector("#tool-thickness").addEventListener("input", this.setToolSize.bind(this));
             document.querySelector("#tool-fillness").addEventListener("click", this.setToolFillness.bind(this));
             document.querySelector("#tool-color").addEventListener("input", this.updateColor.bind(this));
-            document.querySelector("#new-layer").addEventListener("click", this.addLayer.bind(this));
+            document.querySelector("#new-layer").addEventListener("click", this.handleAddLayer.bind(this));
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
             document.querySelector("#tools-holder").addEventListener("click", this.setCurrentTool.bind(this));
             document.querySelector("#tool-symetrie").addEventListener("click", this.setSymetrie.bind(this));
@@ -278,6 +290,12 @@
             this.resizeCanvas();
             if (this.online === true) {
                 this.sendResizeEvent();
+            }
+        },
+        handleAddLayer: function () {
+            this.addLayer();
+            if (this.online === true) {
+                this.sendAddLayer();
             }
         },
         setSymetrie: function (event) {
