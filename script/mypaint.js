@@ -23,21 +23,47 @@
         layers: [],
         currentTool: null,
         currentToolName: "pencil",
+        online: false,
         websocket: null,
         clients: [],
         token: null,
-
+        disenableSocket: function () {
+            if (this.online === false) {
+                this.startSocket();
+            } else {
+                this.stopSocket();
+            }
+        },
         startSocket: function () {
             this.token = this.makeToken();
 
             var self = this;
-            var server = "ws://10.34.1.222:8080";
+            var server = "ws://127.0.0.1:8080";
+            // var server = "ws://10.34.1.222:8080";
             this.websocket = new WebSocket(server);
+
+            setTimeout(function () {
+                if (self.websocket.readyState === 0) {
+                    self.online = false;
+                    alert("Echec de la connection");
+                    return false;
+                } else {
+                    self.online = true;
+                    alert("Vous êtes maintenant en ligne !");
+                }
+
+            }, 500);
+
             this.websocket.onopen = function () {
                 self.websocket.onmessage = function (e) {
                     self.handleSocketMessage(e, self);
                 };
             };
+        },
+        stopSocket: function () {
+            this.websocket.close();
+            this.online = false;
+            alert("Vous êtes maintenant hors ligne !");
         },
         makeToken: function () {
             var text = "";
@@ -121,8 +147,6 @@
             this.websocket.send(json);
         },
         init: function () {
-            this.startSocket();
-
             this.background.canvas = document.querySelector("#canvas-base");
             this.background.context = this.background.canvas.getContext("2d");
 
@@ -194,6 +218,7 @@
             document.querySelector(".layers-list-holder").addEventListener("click", this.manipulateLayers.bind(this));
             document.querySelector("#tools-holder").addEventListener("click", this.setCurrentTool.bind(this));
             document.querySelector("#tool-symetrie").addEventListener("click", this.setSymetrie.bind(this));
+            document.querySelector("#online-switch").addEventListener("click", this.disenableSocket.bind(this));
 
             document.querySelector(".big-canvas-holder").addEventListener("mousedown", this.onMouseDown.bind(this));
             document.querySelector(".big-canvas-holder").addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -279,24 +304,21 @@
             Tool.tmpLayer.context.clearRect(0, 0, Tool.tmpLayer.canvas.width, Tool.tmpLayer.canvas.height);
         },
         onMouseDown: function (mouse) {
-            // this.currentTool.handleMouseDown(mouse);
             this.currentTool.handleMouseDown({x: mouse.layerX, y: mouse.layerY});
-            if (this.websocket) {
+            if (this.online) {
                 this.sendMouseEvent("mousedown", mouse);
                 this.sendCurrTool();
             }
         },
         onMouseMove: function (mouse) {
-            // this.currentTool.handleMouseMove(mouse);
             this.currentTool.handleMouseMove({x: mouse.layerX, y: mouse.layerY});
-            if (this.websocket && this.currentTool.click1) {
+            if (this.online && this.currentTool.click1) {
                 this.sendMouseEvent("mousemove", mouse);
             }
         },
         onMouseUp: function (mouse) {
-            // this.currentTool.handleMouseUp(mouse);
             this.currentTool.handleMouseUp({x: mouse.layerX, y: mouse.layerY});
-            if (this.websocket) {
+            if (this.online) {
                 this.sendMouseEvent("mouseup", mouse);
             }
         },
