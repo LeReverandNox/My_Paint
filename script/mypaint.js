@@ -38,7 +38,8 @@
             this.token = this.makeToken();
 
             var self = this;
-            var server = "ws://127.0.0.1:8080";
+            var server = "ws://92.222.14.159:8080";
+            // var server = "ws://127.0.0.1:8080";
             // var server = "ws://10.34.1.222:8080";
             this.websocket = new WebSocket(server);
 
