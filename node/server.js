@@ -1,4 +1,4 @@
-/*jslint  this for bitwise */
+/*jslint  this devel: true, node: true */
 (function () {
     "use strict";
     var paintServer = {
@@ -26,7 +26,7 @@
         },
         broacast: function (msg, origin) {
             this.wss.clients.forEach(function (client) {
-                if (client._ultron.id !== origin._ultron.id) {
+                if (client !== origin) {
                     client.send(msg);
                 }
             });
