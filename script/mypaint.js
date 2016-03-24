@@ -1,5 +1,5 @@
 /*jslint browser this for bitwise */
-/*global alert $ Tool tools toolFactory URL WebSocket */
+/*global alert $ Tool tools toolFactory URL WebSocket FileReader */
 
 (function (global) {
     "use strict";
@@ -417,9 +417,12 @@
                 var x = event.layerX - (img.width / 2);
                 var y = event.layerY - (img.height / 2);
                 Tool.currLayer.context.drawImage(img, x, y);
-
                 if (self.online === true) {
-                    self.sendDroppedImage(img.src, x, y);
+                    var fr = new FileReader();
+                    fr.readAsDataURL(file);
+                    fr.onload = function () {
+                        self.sendDroppedImage(fr.result, x, y);
+                    };
                 }
             };
         },
@@ -431,9 +434,12 @@
             img.onload = function () {
                 self.resizeCanvas(img.width, img.height);
                 Tool.currLayer.context.drawImage(img, 0, 0);
-
                 if (self.online === true) {
-                    self.sendImportedImage(img.src);
+                    var fr = new FileReader();
+                    fr.readAsDataURL(file);
+                    fr.onload = function () {
+                        self.sendImportedImage(fr.result);
+                    };
                 }
             };
         },
@@ -697,7 +703,7 @@
             var $layer;
 
             for (i = this.layers.length - 1; i >= 0; i -= 1) {
-                $layer = $(this.layers[i].canva);
+                $layer = $(this.layers[i].canvas);
                 this.deleteLayer(this.layers[i], $layer, this.layers[i].id);
             }
 
