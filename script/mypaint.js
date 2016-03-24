@@ -1,5 +1,5 @@
 /*jslint browser this for bitwise */
-/*global alert $ Tool tools toolFactory URL WebSocket FileReader */
+/*global alert $ Tool tools toolFactory URL WebSocket FileReader Blob*/
 
 (function (global) {
     "use strict";
@@ -365,6 +365,7 @@
             document.querySelector(".big-canvas-holder").addEventListener("drop", this.importOnDrop.bind(this));
             document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
             document.querySelector(".download-holder").addEventListener("click", this.exportImgPngJpeg.bind(this));
+            document.querySelector("#export-cmb").addEventListener("click", this.exportCmb.bind(this));
         },
         handleResetCanvas: function () {
             this.resetCanvas();
@@ -412,37 +413,56 @@
             var self = this;
             var dt = event.dataTransfer;
             var file = dt.files[0];
-            var img = new Image();
-            img.src = URL.createObjectURL(file);
-            img.onload = function () {
-                var x = event.layerX - (img.width / 2);
-                var y = event.layerY - (img.height / 2);
-                Tool.currLayer.context.drawImage(img, x, y);
-                if (self.online === true) {
-                    var fr = new FileReader();
-                    fr.readAsDataURL(file);
-                    fr.onload = function () {
-                        self.sendDroppedImage(fr.result, x, y);
+
+            if (file !== undefined) {
+                var reImg = new RegExp("image/.*", "i");
+                var reCmb = new RegExp(".*\.cmb$", "i");
+                if (file.type.match(reImg)) {
+                    var img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    img.onload = function () {
+                        var x = event.layerX - (img.width / 2);
+                        var y = event.layerY - (img.height / 2);
+                        Tool.currLayer.context.drawImage(img, x, y);
+                        if (self.online === true) {
+                            var fr = new FileReader();
+                            fr.readAsDataURL(file);
+                            fr.onload = function () {
+                                self.sendDroppedImage(fr.result, x, y);
+                            };
+                        }
                     };
                 }
-            };
+                if (file.name.match(reCmb)) {
+                    this.importCmb(file);
+                }
+            }
         },
         uploadImage: function (event) {
             var self = this;
             var file = event.target.files[0];
-            var img = new Image();
-            img.src = URL.createObjectURL(file);
-            img.onload = function () {
-                self.resizeCanvas(img.width, img.height);
-                Tool.currLayer.context.drawImage(img, 0, 0);
-                if (self.online === true) {
-                    var fr = new FileReader();
-                    fr.readAsDataURL(file);
-                    fr.onload = function () {
-                        self.sendImportedImage(fr.result);
+            if (file !== undefined) {
+                var reImg = new RegExp("image/.*", "i");
+                var reCmb = new RegExp(".*\.cmb$", "i");
+                if (file.type.match(reImg)) {
+                    var img = new Image();
+                    img.src = URL.createObjectURL(file);
+                    img.onload = function () {
+                        self.resizeCanvas(img.width, img.height);
+                        Tool.currLayer.context.drawImage(img, 0, 0);
+                        if (self.online === true) {
+                            var fr = new FileReader();
+                            fr.readAsDataURL(file);
+                            fr.onload = function () {
+                                self.sendImportedImage(fr.result);
+                            };
+                        }
                     };
                 }
-            };
+                if (file.name.match(reCmb)) {
+                    this.importCmb(file);
+                }
+            }
         },
         exportImgPngJpeg: function (event) {
             // Si on choisi de dl en jpeg, on rempli d'abord le canvas temporaire de blanc, sinon la transparence rend noire
@@ -478,6 +498,51 @@
 
             // On clear le canvas tmp.
             Tool.tmpLayer.context.clearRect(0, 0, Tool.tmpLayer.canvas.width, Tool.tmpLayer.canvas.height);
+        },
+        exportCmb: function () {
+            var datas = [];
+            datas.push(JSON.stringify({width: this.canvasSize.width, height: this.canvasSize.height}) + "***");
+            datas.push(this.background.canvas.toDataURL() + "***");
+            this.layers.forEach(function (layer) {
+                datas.push(layer.canvas.toDataURL() + "***");
+            });
+            var blobLeBricoleur = new Blob(datas, {type: "application/cmb"});
+            console.log(blobLeBricoleur);
+            var link = document.createElement("a");
+            link.download = "my_paint.cmb";
+            link.href = URL.createObjectURL(blobLeBricoleur);
+            link.click();
+        },
+        importCmb: function (file) {
+            var self = this;
+            var fr = new FileReader();
+            fr.readAsBinaryString(file);
+            fr.addEventListener("loadend", function () {
+                var layers = fr.result.split("***");
+                layers.splice(layers.length - 1, 1);
+                var dimensions = JSON.parse(layers[0]);
+                self.resizeCanvas(dimensions.width, dimensions.height);
+                var img = new Image();
+                img.src = layers[1];
+                img.onload = function () {
+                    self.background.context.drawImage(img, 0, 0);
+                    var i = 2;
+                    self.restoreOneCanvas(i, layers);
+                };
+            });
+        },
+        restoreOneCanvas: function (i, layers) {
+            var self = this;
+            var img = new Image();
+            img.src = layers[i];
+            img.onload = function () {
+                self.addLayer();
+                self.layers[i - 2].context.drawImage(img, 0, 0);
+                if (i < layers.length - 1) {
+                    i += 1;
+                    self.restoreOneCanvas(i, layers);
+                }
+            };
         },
         onMouseDown: function (mouse) {
             this.currentTool.handleMouseDown({x: mouse.layerX, y: mouse.layerY});
