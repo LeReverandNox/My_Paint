@@ -88,6 +88,7 @@
                 } else {
                     client.tool = socketTool;
                 }
+                // console.log("Le client dessine sur : ", socketTool.__proto__.currLayer.context);
             }
             var self = this;
             setTimeout(function () {
@@ -799,16 +800,16 @@
 
             if (layer.active === true) {
                 if (lastLayer === null) {
-                    this.background.active = true;
-                    Tool.currLayer.canvas = this.background.canvas;
-                    Tool.currLayer.context = this.background.context;
-                    this.updateTmpSymZindex(0);
+                    this.activateBackground();
+                    if (this.online) {
+                        this.sendLayerAction("activateBG", null);
+                    }
                 } else {
                     var layerToActivate = this.grepOne(this.layers, "id", lastLayer.id);
-                    layerToActivate.active = true;
-                    Tool.currLayer.canvas = layerToActivate.canvas;
-                    Tool.currLayer.context = layerToActivate.context;
-                    this.updateTmpSymZindex(layerToActivate.order);
+                    this.activateLayer(layerToActivate);
+                    if (this.online) {
+                        this.sendLayerAction("activate", lastLayer.id);
+                    }
                 }
             }
         },

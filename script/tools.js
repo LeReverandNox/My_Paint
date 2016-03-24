@@ -106,6 +106,7 @@
         },
         setContextOptions: function (context) {
             context.lineCap = this.toolEnd;
+            context.lineJoin = "round";
             context.strokeStyle = this.toolStrokeColorHex;
             context.fillStyle = this.toolFillColorHex;
             context.lineWidth = this.toolThickness;
