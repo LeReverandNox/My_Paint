@@ -1066,9 +1066,18 @@
                 }
                 hsl.h /= 6;
             }
-            hsl.h = parseInt((hsl.h * 360).toFixed(0), 10);
-            hsl.s = parseInt((hsl.s * 100).toFixed(0), 10);
-            hsl.l = parseInt((hsl.l * 100).toFixed(0), 10);
+
+            var multi = (hsl.h * 360);
+            var fixed = multi.toFixed(0);
+            hsl.h = parseInt(fixed, 10);
+
+            multi = (hsl.s * 360);
+            fixed = multi.toFixed(0);
+            hsl.s = parseInt(fixed, 10);
+
+            multi = (hsl.l * 360);
+            fixed = multi.toFixed(0);
+            hsl.l = parseInt(fixed, 10);
 
             return hsl;
         },
