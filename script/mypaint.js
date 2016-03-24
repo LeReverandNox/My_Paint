@@ -54,6 +54,7 @@
             }, 500);
 
             this.websocket.onopen = function () {
+                self.sendCurrTool();
                 self.websocket.onmessage = function (e) {
                     self.handleSocketMessage(e, self);
                 };
@@ -119,7 +120,7 @@
                     self.addLayer();
                     break;
                 case "layerAction":
-                    self.manageLayerFromClient(obj.action, obj.num);
+                    self.manageLayerFromClient(obj.token, obj.action, obj.num);
                     break;
                 }
             }, 10);
@@ -218,6 +219,7 @@
         sendLayerAction: function (name, num) {
             var obj = {
                 event: "layerAction",
+                token: this.token,
                 action: name,
                 num: num
             };
@@ -243,13 +245,16 @@
                 Tool.currLayer.context.drawImage(img, 0, 0);
             };
         },
-        manageLayerFromClient: function (action, num) {
+        manageLayerFromClient: function (token, action, num) {
             var layer = this.grepOne(this.layers, "id", num);
             var $layer = $("#layer-" + num);
 
             switch (action) {
             case "activate":
-                this.activateLayer(layer);
+                this.updateClientCtx(token, layer, null);
+                break;
+            case "activateBG":
+                this.updateClientCtx(token, null, layer);
                 break;
             case "delete":
                 this.deleteLayer(layer, $layer);
@@ -264,6 +269,17 @@
 
             this.recalculateOrder();
             this.updateLayersList();
+        },
+        updateClientCtx: function (token, layer, background) {
+            var client = this.findSocketByToken(token);
+            if (layer !== null) {
+                client.tool.currLayer.canvas = layer.canvas;
+                client.tool.currLayer.context = layer.context;
+            }
+            if (background !== null) {
+                client.tool.currLayer.canvas = this.background.canvas;
+                client.tool.currLayer.context = this.background.context;
+            }
         },
         init: function () {
             this.background.canvas = document.querySelector("#canvas-base");
@@ -735,6 +751,9 @@
                 break;
             case "background-active":
                 this.activateBackground();
+                if (this.online) {
+                    this.sendLayerAction("activateBG", num);
+                }
                 break;
             }
 
