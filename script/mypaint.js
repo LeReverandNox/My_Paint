@@ -424,6 +424,7 @@
                         var x = event.layerX - (img.width / 2);
                         var y = event.layerY - (img.height / 2);
                         Tool.currLayer.context.drawImage(img, x, y);
+                        self.makeMustache(Tool.currLayer, this);
                         if (self.online === true) {
                             var fr = new FileReader();
                             fr.readAsDataURL(file);
@@ -450,6 +451,7 @@
                     img.onload = function () {
                         self.resizeCanvas(img.width, img.height);
                         Tool.currLayer.context.drawImage(img, 0, 0);
+                        self.makeMustache(Tool.currLayer, this);
                         if (self.online === true) {
                             var fr = new FileReader();
                             fr.readAsDataURL(file);
@@ -463,6 +465,59 @@
                     this.importCmb(file);
                 }
             }
+        },
+        drawMustache: function (layer, face) {
+            var i = Math.floor(Math.random() * (21 - 1) + 1);
+            var mustache = new Image();
+            mustache.src = 'style/mustache' + i + '.png';
+            mustache.onload = function () {
+                // layer.context.beginPath();
+                // layer.context.rect(face.x, face.y, face.width, face.height);
+                // layer.context.strokeStyle = "red";
+                // layer.context.stroke();
+                layer.context.closePath();
+                var mousW = face.width - ((face.width * 30) / 100);
+                var mousH = (mustache.height / mustache.width) * face.width;
+                var mousX = face.x + ((mousW * 24) / 100);
+                var mousY = (face.y + face.height) - mousH;
+
+                switch (i) {
+                case 1:
+                    mousY = (face.y + face.height) - (mousH + (mousH * 20) / 100);
+                    break;
+                case 7:
+                    mousY = (face.y + (face.height - (mousH - (mousH * 50) / 100)));
+                    break;
+                case 8:
+                    mousY = (face.y + (face.height - (mousH + (mousH * 25) / 100)));
+                    break;
+                case 9:
+                    mousY = (face.y + (face.height - (mousH - (mousH * 25) / 100)));
+                    break;
+                case 14:
+                    mousY = (face.y + (face.height - (mousH - (mousH * 25) / 100)));
+                    break;
+                case 17:
+                    mousY = (face.y + (face.height - (mousH - (mousH * 60) / 100)));
+                    break;
+                 }
+
+                layer.context.drawImage(mustache, mousX, mousY, mousW, mousH);
+            }
+        },
+        makeMustache: function (layer) {
+            var self = this;
+            var img = new Image();
+            img.src = layer.canvas.toDataURL();
+            $(img).load(function () {
+                $(this).faceDetection({
+                    complete: function (faces) {
+                        faces.forEach(function (face) {
+                            self.drawMustache(layer, face);
+                        });
+                    }
+                });
+            });
         },
         exportImgPngJpeg: function (event) {
             // Si on choisi de dl en jpeg, on rempli d'abord le canvas temporaire de blanc, sinon la transparence rend noire
