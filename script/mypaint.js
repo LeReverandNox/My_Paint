@@ -423,8 +423,8 @@
                     img.onload = function () {
                         var x = event.layerX - (img.width / 2);
                         var y = event.layerY - (img.height / 2);
-                        Tool.currLayer.context.drawImage(img, x, y);
-                        self.makeMustache(Tool.currLayer, this);
+                        Tool.tmpLayer.context.drawImage(img, x, y);
+                        self.scanFaces(Tool.tmpLayer, this);
                         if (self.online === true) {
                             var fr = new FileReader();
                             fr.readAsDataURL(file);
@@ -450,8 +450,8 @@
                     img.src = URL.createObjectURL(file);
                     img.onload = function () {
                         self.resizeCanvas(img.width, img.height);
-                        Tool.currLayer.context.drawImage(img, 0, 0);
-                        self.makeMustache(Tool.currLayer, this);
+                        Tool.tmpLayer.context.drawImage(img, 0, 0);
+                        self.scanFaces(Tool.tmpLayer, this);
                         if (self.online === true) {
                             var fr = new FileReader();
                             fr.readAsDataURL(file);
@@ -467,6 +467,7 @@
             }
         },
         drawMustache: function (layer, face) {
+            var self = this;
             var i = Math.floor(Math.random() * (21 - 1) + 1);
             var mustache = new Image();
             mustache.src = 'style/mustache' + i + '.png';
@@ -500,12 +501,13 @@
                 case 17:
                     mousY = (face.y + (face.height - (mousH - (mousH * 60) / 100)));
                     break;
-                 }
-
+                }
                 layer.context.drawImage(mustache, mousX, mousY, mousW, mousH);
-            }
+                Tool.currLayer.context.drawImage(layer.canvas, 0, 0);
+                layer.context.clearRect(0, 0, self.canvasSize.width, self.canvasSize.height);
+            };
         },
-        makeMustache: function (layer) {
+        scanFaces: function (layer) {
             var self = this;
             var img = new Image();
             img.src = layer.canvas.toDataURL();
@@ -515,6 +517,8 @@
                         faces.forEach(function (face) {
                             self.drawMustache(layer, face);
                         });
+                        Tool.currLayer.context.drawImage(layer.canvas, 0, 0);
+                        layer.context.clearRect(0, 0, self.canvasSize.width, self.canvasSize.height);
                     }
                 });
             });
