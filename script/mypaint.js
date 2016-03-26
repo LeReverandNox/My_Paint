@@ -238,7 +238,6 @@
             img.onload = function () {
                 Tool.tmpLayer.context.drawImage(img, x, y);
                 self.scanFaces(Tool.tmpLayer);
-                Tool.currLayer.context.drawImage(img, x, y);
             };
         },
         importImageFromClient: function (src) {
@@ -249,7 +248,6 @@
                 self.resizeCanvas(img.width, img.height);
                 Tool.tmpLayer.context.drawImage(img, 0, 0);
                 self.scanFaces(Tool.tmpLayer);
-                Tool.currLayer.context.drawImage(img, 0, 0);
             };
         },
         manageLayerFromClient: function (token, action, num) {
