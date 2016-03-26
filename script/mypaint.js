@@ -30,6 +30,7 @@
         konamiCount: 0,
         konamiState: false,
         konamiSound: new Audio("script/troll.mp3"),
+        konamiNbImages: 26,
 
         disenableSocket: function () {
             if (this.online === false) {
@@ -377,6 +378,24 @@
             document.addEventListener("keydown", this.konami.bind(this));
         },
         konami: function (key) {
+            switch (key.keyCode) {
+            case 32:
+                key.preventDefault();
+                break;
+            case 37:
+                key.preventDefault();
+                break;
+            case 38:
+                key.preventDefault();
+                break;
+            case 39:
+                key.preventDefault();
+                break;
+            case 40:
+                key.preventDefault();
+                break;
+            }
+
             var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 
             if (key.keyCode === konami[this.konamiCount]) {
@@ -398,16 +417,29 @@
             }
         },
         hailToDasilvB: function () {
-            var self = this;
             this.konamiSound.play();
+            var i = 0;
+            this.loadTroll(i);
+        },
+        loadTroll: function (i) {
+            var self = this;
             var img = new Image();
-            img.src = "script/troll.jpeg";
+            img.src = "script/troll/troll" + i + ".png";
             img.onload = function () {
-                self.resizeCanvas(img.width, img.height);
-                Tool.currLayer.context.drawImage(img, 0, 0);
-                var $canvas = $(Tool.currLayer.canvas);
+                if (i === 0) {
+                    self.resizeCanvas(img.width, img.height);
+                }
+                Tool.tmpLayer.context.drawImage(img, 0, 0);
+                var $canvas = $(Tool.tmpLayer.canvas);
                 $canvas.hide();
-                $canvas.fadeIn(5000);
+                $canvas.fadeIn(750, function () {
+                    Tool.currLayer.context.drawImage(Tool.tmpLayer.canvas, 0, 0);
+                    Tool.tmpLayer.context.clearRect(0, 0, self.canvasSize.width, self.canvasSize.height);
+                    if (i < self.konamiNbImages) {
+                        i += 1;
+                        self.loadTroll(i);
+                    }
+                });
             };
         },
         handleResetCanvas: function () {
