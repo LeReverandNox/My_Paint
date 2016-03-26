@@ -566,7 +566,6 @@
                 datas.push(layer.canvas.toDataURL() + "***");
             });
             var blobLeBricoleur = new Blob(datas, {type: "application/cmb"});
-            console.log(blobLeBricoleur);
             var link = document.createElement("a");
             link.download = "my_paint.cmb";
             link.href = URL.createObjectURL(blobLeBricoleur);
@@ -1047,7 +1046,6 @@
         },
         updateColor: function (e) {
             var mode = e.target.getAttribute("data-mode");
-
             // On switch sur la premiere classe... technique de gitan
             switch (e.target.className.split(" ")[0]) {
             case "color-hexa":
@@ -1152,7 +1150,7 @@
             return RGB;
         },
         componentToHex: function (c) {
-            var hex = c.toString(16);
+            var hex = parseInt(c).toString(16);
             return hex.length === 1
                 ? "0" + hex
                 : hex;
