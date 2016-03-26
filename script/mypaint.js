@@ -1159,62 +1159,52 @@
             return "#" + this.componentToHex(rgb.r) + this.componentToHex(rgb.g) + this.componentToHex(rgb.b);
         },
         rgbToHSL: function (rgb) {
-            var rgb2 = {};
-            var hsl = {};
-            var difference;
+            var r = rgb.r / 255;
+            var g = rgb.g / 255;
+            var b = rgb.b / 255;
 
-            rgb2.r = this.toPercent(parseInt(rgb.r, 10) % 256, 256);
-            rgb2.g = this.toPercent(parseInt(rgb.g, 10) % 256, 256);
-            rgb2.b = this.toPercent(parseInt(rgb.b, 10) % 256, 256);
+            var max = Math.max(r, g, b);
+            var min = Math.min(r, g, b);
+            var h = (max + min) / 2;
+            var s = (max + min) / 2;
+            var l = (max + min) / 2;
 
-            var max = Math.max(rgb2.r, rgb2.g, rgb2.b);
-            var min = Math.min(rgb2.r, rgb2.g, rgb2.b);
-
-            hsl.l = (max + min) / 2;
             if (max === min) {
-                hsl.h = 0;
-                hsl.s = 0;
+                h = 0;
+                s = 0;
             } else {
-                difference = max - min;
-                hsl.s = hsl.l > 0.5
-                    ? difference / (2 - max - min)
-                    : difference / (max + min);
+                var d = max - min;
+                s = l > 0.5
+                    ? d / (2 - max - min)
+                    : d / (max + min);
 
                 switch (max) {
-                case rgb2.r:
-                    hsl.h = (rgb2.g - rgb2.b) / difference + (rgb2.g < rgb2.b
+                case r:
+                    h = (g - b) / d + (g < b
                         ? 6
                         : 0);
                     break;
-                case rgb2.g:
-                    hsl.h = (rgb2.b - rgb2.r) / difference + 2;
+                case g:
+                    h = (b - r) / d + 2;
                     break;
-                case rgb2.b:
-                    hsl.h = (rgb2.r - rgb2.g) / difference + 4;
+                case b:
+                    h = (r - g) / d + 4;
                     break;
                 }
-                hsl.h /= 6;
+
+                h = h / 6;
             }
-
-            var multi = (hsl.h * 360);
-            var fixed = multi.toFixed(0);
-            hsl.h = parseInt(fixed, 10);
-
-            multi = (hsl.s * 360);
-            fixed = multi.toFixed(0);
-            hsl.s = parseInt(fixed, 10);
-
-            multi = (hsl.l * 360);
-            fixed = multi.toFixed(0);
-            hsl.l = parseInt(fixed, 10);
-
+            var hsl = {};
+            hsl.h = (h * 100 + 0.5) | 0;
+            hsl.s = ((s * 100 + 0.5) | 0);
+            hsl.l = ((l * 100 + 0.5) | 0);
             return hsl;
         },
         hslToRGB: function (hsl) {
             var rgb = {};
-            var h = hsl.h;
-            var s = hsl.s;
-            var l = hsl.l;
+            var h = parseInt(hsl.h);
+            var s = parseInt(hsl.s);
+            var l = parseInt(hsl.l);
             var m;
             var c;
             var x;
@@ -1261,7 +1251,6 @@
             rgb.r = Math.round((rgb.r + m) * 255);
             rgb.g = Math.round((rgb.g + m) * 255);
             rgb.b = Math.round((rgb.b + m) * 255);
-
             return rgb;
         },
         toPercent: function (amount, limit) {
