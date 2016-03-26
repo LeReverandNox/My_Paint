@@ -1185,9 +1185,9 @@
             }
 
             var hsl = {};
-            hsl.l = Math.floor(l * 100);
-            hsl.s = Math.floor(s * 100);
-            hsl.h = Math.floor(h * 60);
+            hsl.l = Math.round(l * 100);
+            hsl.s = Math.round(s * 100);
+            hsl.h = Math.round(h * 60);
             if (hsl.h < 0) {
                 hsl.h += 360;
             }
