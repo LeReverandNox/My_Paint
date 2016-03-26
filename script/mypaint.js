@@ -743,13 +743,13 @@
 
             var $base = $("<p class='base'>Background</p>");
             $hidden = this.background.hidden === false
-                ? $("<input type='checkbox' class='background-hide' attr-num='" + this.background.id + "' checked>")
-                : $("<input type='checkbox' class='background-hide' attr-num='" + this.background.id + "'>");
+                ? $("<input type='checkbox' class='background-hide' data-num='" + this.background.id + "' checked>")
+                : $("<input type='checkbox' class='background-hide' data-num='" + this.background.id + "'>");
             $hidden.appendTo($base);
 
             $active = this.background.active === true
-                ? $("<input type='checkbox' class='background-active' attr-num='" + this.background.id + "' checked>")
-                : $("<input type='checkbox' class='background-active' attr-num='" + this.background.id + "'>");
+                ? $("<input type='checkbox' class='background-active' data-num='" + this.background.id + "' checked>")
+                : $("<input type='checkbox' class='background-active' data-num='" + this.background.id + "'>");
             $active.appendTo($base);
 
             $base.appendTo($layersListHolder);
@@ -761,22 +761,22 @@
                 $layer = $("<li class='layer-li'>Calque " + layer.id + "</li>");
 
                 $hidden = layer.hidden === false
-                    ? $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "' checked>")
-                    : $("<input type='checkbox' class='layer-hide' attr-num='" + layer.id + "'>");
+                    ? $("<input type='checkbox' class='layer-hide' data-num='" + layer.id + "' checked>")
+                    : $("<input type='checkbox' class='layer-hide' data-num='" + layer.id + "'>");
                 $hidden.appendTo($layer);
 
                 $active = layer.active === true
-                    ? $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "' checked>")
-                    : $("<input type='checkbox' class='layer-active' attr-num='" + layer.id + "'>");
+                    ? $("<input type='checkbox' class='layer-active' data-num='" + layer.id + "' checked>")
+                    : $("<input type='checkbox' class='layer-active' data-num='" + layer.id + "'>");
                 $active.appendTo($layer);
 
-                $up = $("<button class='layer-up' attr-num='" + layer.id + "'>Up</button>");
+                $up = $("<button class='layer-up' data-num='" + layer.id + "'>Up</button>");
                 $up.appendTo($layer);
 
-                $down = $("<button class='layer-down' attr-num='" + layer.id + "'>Down</button>");
+                $down = $("<button class='layer-down' data-num='" + layer.id + "'>Down</button>");
                 $down.appendTo($layer);
 
-                $delete = $("<button class='layer-delete' attr-num='" + layer.id + "'>Supprimer</button>");
+                $delete = $("<button class='layer-delete' data-num='" + layer.id + "'>Supprimer</button>");
                 $delete.appendTo($layer);
 
                 $layer.appendTo($layersList);
@@ -846,7 +846,7 @@
             return id;
         },
         manipulateLayers: function (e) {
-            var num = parseInt(e.target.getAttribute("attr-num"));
+            var num = parseInt(e.target.getAttribute("data-num"));
             var layer = this.grepOne(this.layers, "id", num);
             var $layer = $("#layer-" + num);
 
@@ -1046,7 +1046,7 @@
             inputsFillHSL[2].value = Tool.toolFillColorHSL.l;
         },
         updateColor: function (e) {
-            var mode = e.target.getAttribute("attr-mode");
+            var mode = e.target.getAttribute("data-mode");
 
             // On switch sur la premiere classe... technique de gitan
             switch (e.target.className.split(" ")[0]) {
