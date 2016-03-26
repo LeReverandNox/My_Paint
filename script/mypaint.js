@@ -1165,39 +1165,32 @@
 
             var max = Math.max(r, g, b);
             var min = Math.min(r, g, b);
-            var h = (max + min) / 2;
-            var s = (max + min) / 2;
+            var h = 0;
+            var s = 0;
             var l = (max + min) / 2;
 
-            if (max === min) {
-                h = 0;
-                s = 0;
-            } else {
-                var d = max - min;
-                s = l > 0.5
-                    ? d / (2 - max - min)
-                    : d / (max + min);
-
-                switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b
-                        ? 6
-                        : 0);
-                    break;
-                case g:
-                    h = (b - r) / d + 2;
-                    break;
-                case b:
-                    h = (r - g) / d + 4;
-                    break;
+            if (max !== min) {
+                if (l < 0.5) {
+                    s = (max - min) / (max + min);
+                } else {
+                    s = (max - min) / (2.0 - max - min);
                 }
-
-                h = h / 6;
+                if (r === max) {
+                    h = (g - b) / (max - min);
+                } else if (g === max) {
+                    h = 2.0 + (b - r) / (max - min);
+                } else {
+                    h = 4.0 + (r - g) / (max - min);
+                }
             }
+
             var hsl = {};
-            hsl.h = (h * 100 + 0.5) | 0;
-            hsl.s = ((s * 100 + 0.5) | 0);
-            hsl.l = ((l * 100 + 0.5) | 0);
+            hsl.l = Math.floor(l * 100);
+            hsl.s = Math.floor(s * 100);
+            hsl.h = Math.floor(h * 60);
+            if (hsl.h < 0) {
+                hsl.h += 360;
+            }
             return hsl;
         },
         hslToRGB: function (hsl) {
