@@ -623,7 +623,7 @@
             }
         },
         setCurrentTool: function (tools) {
-            this.currentToolName = tools.target.getAttribute("attr-tool");
+            this.currentToolName = tools.target.getAttribute("data-tool");
             this.currentTool = toolFactory.new(this.currentToolName);
         },
         resizeCanvas: function (widthTo, heightTo) {
@@ -691,7 +691,7 @@
             var $toolsHolder = $("#tools-holder");
             var $tool;
             $.each(tools, function (tool) {
-                $tool = $("<button class='" + tool + "' attr-tool='" + tool + "'>" + tool + "</button>");
+                $tool = $("<button class='" + tool + "' data-tool='" + tool + "'>" + tool + "</button>");
                 $tool.appendTo($toolsHolder);
             });
         },
