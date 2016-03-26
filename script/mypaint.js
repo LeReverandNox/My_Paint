@@ -27,6 +27,10 @@
         websocket: null,
         clients: [],
         token: null,
+        konamiCount: 0,
+        konamiState: false,
+        konamiSound: new Audio("script/troll.mp3"),
+
         disenableSocket: function () {
             if (this.online === false) {
                 this.startSocket();
@@ -369,6 +373,42 @@
             document.querySelector("#image-upload").addEventListener("change", this.uploadImage.bind(this));
             document.querySelector(".download-holder").addEventListener("click", this.exportImgPngJpeg.bind(this));
             document.querySelector("#export-cmb").addEventListener("click", this.exportCmb.bind(this));
+
+            document.addEventListener("keydown", this.konami.bind(this));
+        },
+        konami: function (key) {
+            var konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+
+            if (key.keyCode === konami[this.konamiCount]) {
+                this.konamiCount += 1;
+                if (this.konamiCount === konami.length) {
+                    if (this.konamiState === false) {
+                        this.konamiState = true;
+                        this.hailToDasilvB();
+                    } else {
+                        this.konamiSound.pause();
+                        this.konamiSound.currentTime = 0;
+                        this.konamiState = false;
+                        this.resetCanvas();
+                    }
+                    this.konamiCount = 0;
+                }
+            } else {
+                this.konamiCount = 0;
+            }
+        },
+        hailToDasilvB: function () {
+            var self = this;
+            this.konamiSound.play();
+            var img = new Image();
+            img.src = "script/troll.jpeg";
+            img.onload = function () {
+                self.resizeCanvas(img.width, img.height);
+                Tool.currLayer.context.drawImage(img, 0, 0);
+                var $canvas = $(Tool.currLayer.canvas);
+                $canvas.hide();
+                $canvas.fadeIn(5000);
+            };
         },
         handleResetCanvas: function () {
             this.resetCanvas();
@@ -477,13 +517,13 @@
             var self = this;
             var i = Math.floor(Math.random() * (21 - 1) + 1);
             var mustache = new Image();
-            mustache.src = 'style/mustache' + i + '.png';
+            mustache.src = 'style/mustaches/mustache' + i + '.png';
             mustache.onload = function () {
                 // layer.context.beginPath();
                 // layer.context.rect(face.x, face.y, face.width, face.height);
                 // layer.context.strokeStyle = "red";
                 // layer.context.stroke();
-                layer.context.closePath();
+                // layer.context.closePath();
                 var mousW = face.width - ((face.width * 30) / 100);
                 var mousH = (mustache.height / mustache.width) * face.width;
                 var mousX = face.x + ((mousW * 24) / 100);
@@ -547,7 +587,7 @@
             layersForMerge.sort(this.comparator);
             layersForMerge.forEach(function (layer) {
                 if (layer.hidden === false) {
-                    Tool.tmpLayer.context.drawImage(layer.canva, 0, 0);
+                    Tool.tmpLayer.context.drawImage(layer.canvas, 0, 0);
                 }
             });
 
@@ -1252,9 +1292,6 @@
             rgb.g = Math.round((rgb.g + m) * 255);
             rgb.b = Math.round((rgb.b + m) * 255);
             return rgb;
-        },
-        toPercent: function (amount, limit) {
-            return amount / limit;
         }
     };
 
