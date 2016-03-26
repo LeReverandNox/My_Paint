@@ -232,9 +232,12 @@
             this.websocket.send(json);
         },
         dropImageFromClient: function (src, x, y) {
+            var self = this;
             var img = new Image();
             img.src = src;
             img.onload = function () {
+                Tool.tmpLayer.context.drawImage(img, x, y);
+                self.scanFaces(Tool.tmpLayer);
                 Tool.currLayer.context.drawImage(img, x, y);
             };
         },
@@ -244,6 +247,8 @@
             img.src = src;
             img.onload = function () {
                 self.resizeCanvas(img.width, img.height);
+                Tool.tmpLayer.context.drawImage(img, 0, 0);
+                self.scanFaces(Tool.tmpLayer);
                 Tool.currLayer.context.drawImage(img, 0, 0);
             };
         },
