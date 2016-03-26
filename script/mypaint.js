@@ -397,14 +397,18 @@
         setSymetrie: function (event) {
             switch (event.target.className) {
             case "sym-h":
-                Tool.symHorizontal = Tool.symHorizontal === true
-                    ? false
-                    : true;
+                if (Tool.symHorizontal === true) {
+                    Tool.symHorizontal = false;
+                } else {
+                    Tool.symHorizontal = true;
+                }
                 break;
             case "sym-v":
-                Tool.symVertical = Tool.symVertical === true
-                    ? false
-                    : true;
+                if (Tool.symVertical === true) {
+                    Tool.symVertical = false;
+                } else {
+                    Tool.symVertical = true;
+                }
                 break;
             }
         },
