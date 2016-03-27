@@ -1,21 +1,21 @@
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
-*/
+   */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+   html, body, div, span, applet, object, iframe,
+   h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+   a, abbr, acronym, address, big, cite, code,
+   del, dfn, em, img, ins, kbd, q, s, samp,
+   small, strike, strong, sub, sup, tt, var,
+   b, u, i, center,
+   dl, dt, dd, ol, ul, li,
+   fieldset, form, label, legend,
+   table, caption, tbody, tfoot, thead, tr, th, td,
+   article, aside, canvas, details, embed,
+   figure, figcaption, footer, header, hgroup,
+   menu, nav, output, ruby, section, summary,
+   time, mark, audio, video {
     margin: 0;
     padding: 0;
     border: 0;
@@ -48,9 +48,12 @@ table {
 }
 
 /* My_Paint */
-
+body {
+    font-family: sans-serif;
+    font-size: 0.9em;
+}
 .main-wrapper {
-    width: 900px;
+    width: 950px;
     margin: 0 auto;
 }
 
@@ -63,6 +66,7 @@ table {
     text-align: center;
 }
 h1 {
+    font-size: 3em;
     color: red;
 }
 
@@ -72,7 +76,7 @@ h1 {
 }
 .big-canvas-holder {
     margin: 0 auto;
-    border: 1px solid black;
+    border: 2px solid black;
     border-radius: 5px;
     cursor: crosshair;
     position: relative;
@@ -87,7 +91,62 @@ h1 {
     /*display: none;*/
     opacity: 0;
 }
-
+#tool-fill-color, #tool-stroke-color {
+    display: inline-block;
+    width: 215px;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+}
+#tool-fill-color input, #tool-stroke-color input {
+    width: 40px;
+}
+#resize-form {
+    /*width: 150px;*/
+}
+#resize-form input {
+    width: 50px;
+}
+#tool-form input {
+    width: 40px;
+}
+#tools-holder button {
+    margin-right: 5px;
+}
+#block1, #block2 {
+    display: inline-block;
+    width: 470px;
+    vertical-align: top;
+}
+#resize-form, #tools-holder, #tool-form, #tool-symetrie, #reset-form, #layers-block, .file-upload-holder, .download-holder, .export-cmb, .online-holder {
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+#block1 p, #block2 p {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#block1 input, #block2 input {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+#resize-dims {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.big-canvas-holder {
+    margin-bottom: 10px;
+}
+p, input, label {
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;
+}
 /* footer */
 
 .main-footer {

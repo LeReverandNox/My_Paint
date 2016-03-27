@@ -241,6 +241,7 @@
                 };
 
                 this.setContextOptions(this.tmpLayer.context);
+                this.tmpLayer.context.lineJoin = "miter";
 
                 this.tmpLayer.context.rect(this.origin.x, this.origin.y, dist.x, dist.y);
                 if (this.toolFill === true) {

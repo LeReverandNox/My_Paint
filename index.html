@@ -26,91 +26,106 @@
                     <canvas id="canvas-tmp"></canvas>
                     <canvas id="canvas-sym"></canvas>
                 </div>
-                <div id="resize-form">
-                    <p>Taille du canvas</p>
-                    <label for="canvas-width">Width : </label>
-                    <input type="number" id="canvas-width" placeholder="La largeur du canvas" />
-                    <br />
-                    <label for="canvas-height">Height : </label>
-                    <input type="number" id="canvas-height" placeholder="La hauteur du canvas" />
-                    <button id="canvas-reset-dimensions">Par défaut</button>
-                    <button id="canvas-set-dimensions">Redimensionner</button>
-                </div>
-                <div id="reset-form">
-                    <button id="canvas-reset">Reset</button>
-                </div>
-                <div id="tool-form">
-                    <label for="tool-thickness">Largeur de l'outil : </label>
-                    <input type="number" name="tool-thickness" id="tool-thickness" />
-                    <label for="tool-fillness">Plein</label>
-                    <input type="checkbox" name="tool-fillness" id="tool-fillness">
-                </div>
-                <div id="tool-symetrie">
-                    <button class="sym-h">Symétrie horizontale</button>
-                    <button class="sym-v">Symétrie verticale</button>
-                </div>
-                <div id="tool-color">
-                    <div id="tool-fill-color">
-                        <p>FIll color</p>
-                        <input type="color"  name="color-hexa" class="color-hexa color-hexa-fill" data-mode="fill" />
-                        <div id="fill-tool-color-rgb">
-                            <label for="fill-color-r">R : </label>
-                            <input type="number" name="fill-color-r" class="color-rgb color-rgb-fill" id="fill-color-r" data-mode="fill" />
-                            <label for="fill-color-g">G : </label>
-                            <input type="number" name="fill-color-g" class="color-rgb color-rgb-fill" id="fill-color-g" data-mode="fill" />
-                            <label for="fill-color-b">B : </label>
-                            <input type="number" name="fill-color-b" class="color-rgb color-rgb-fill" id="fill-color-b" data-mode="fill" />
+                <div id="block1">
+
+                    <div id="resize-form">
+                        <p>Taille du canvas</p>
+                        <div id="resize-dims">
+                            <label for="canvas-width">Width : </label>
+                            <input type="number" id="canvas-width" placeholder="La largeur du canvas" />
+                            <label for="canvas-height">Height : </label>
+                            <input type="number" id="canvas-height" placeholder="La hauteur du canvas" />
                         </div>
-                        <div id="fill-tool-color-hsl">
-                            <label for="fill-color-h">Hue : </label>
-                            <input type="number" name="fill-color-h" class="color-hsl color-hsl-fill" id="fill-color-h" data-mode="fill" />
-                            <label for="fill-color-s">Saturation : </label>
-                            <input type="number" name="fill-color-s" class="color-hsl color-hsl-fill" id="fill-color-s" data-mode="fill" />
-                            <label for="fill-color-l">Lightness : </label>
-                            <input type="number" name="fill-color-l" class="color-hsl color-hsl-fill" id="fill-color-l" data-mode="fill" />
+                        <button id="canvas-reset-dimensions">Taille par défaut</button>
+                        <button id="canvas-set-dimensions">Redimensionner</button>
+                    </div>
+                    <div id="reset-form">
+                        <p>RÉINITIALISER</p>
+                        <button id="canvas-reset">Reset du dessin</button>
+                    </div>
+                    <div id="tools-holder">
+                        <p>Outils</p>
+                    </div>
+                    <div id="tool-form">
+                        <p>Options</p>
+                        <label for="tool-thickness">Largeur de l'outil : </label>
+                        <input type="number" name="tool-thickness" id="tool-thickness" />
+                        <label for="tool-fillness">Formes pleines</label>
+                        <input type="checkbox" name="tool-fillness" id="tool-fillness">
+                    </div>
+                    <div id="tool-symetrie">
+                        <p>Symétries</p>
+                        <button class="sym-h">Symétrie horizontale</button>
+                        <button class="sym-v">Symétrie verticale</button>
+                    </div>
+                    <div id="tool-color">
+                        <div id="tool-fill-color">
+                            <p>Couleur de remplissage</p>
+                            <input type="color"  name="color-hexa" class="color-hexa color-hexa-fill" data-mode="fill" />
+                            <div id="fill-tool-color-rgb">
+                                <label for="fill-color-r">R : </label>
+                                <input type="number" name="fill-color-r" class="color-rgb color-rgb-fill" id="fill-color-r" data-mode="fill" />
+                                <label for="fill-color-g">G : </label>
+                                <input type="number" name="fill-color-g" class="color-rgb color-rgb-fill" id="fill-color-g" data-mode="fill" />
+                                <label for="fill-color-b">B : </label>
+                                <input type="number" name="fill-color-b" class="color-rgb color-rgb-fill" id="fill-color-b" data-mode="fill" />
+                            </div>
+                            <div id="fill-tool-color-hsl">
+                                <label for="fill-color-h">H : </label>
+                                <input type="number" name="fill-color-h" class="color-hsl color-hsl-fill" id="fill-color-h" data-mode="fill" />
+                                <label for="fill-color-s">S : </label>
+                                <input type="number" name="fill-color-s" class="color-hsl color-hsl-fill" id="fill-color-s" data-mode="fill" />
+                                <label for="fill-color-l">L : </label>
+                                <input type="number" name="fill-color-l" class="color-hsl color-hsl-fill" id="fill-color-l" data-mode="fill" />
+                            </div>
+                        </div>
+                        <div id="tool-stroke-color">
+                            <p>Couleur des traits</p>
+                            <input type="color"  name="color-hexa" class="color-hexa color-hexa-stroke" data-mode="stroke" />
+                            <div id="stroke-tool-color-rgb">
+                                <label for="stroke-color-r">R : </label>
+                                <input type="number" name="stroke-color-r" class="color-rgb color-rgb-stroke" id="stroke-color-r" data-mode="stroke" />
+                                <label for="stroke-color-g">G : </label>
+                                <input type="number" name="stroke-color-g" class="color-rgb color-rgb-stroke" id="stroke-color-g" data-mode="stroke" />
+                                <label for="stroke-color-b">B : </label>
+                                <input type="number" name="stroke-color-b" class="color-rgb color-rgb-stroke" id="stroke-color-b" data-mode="stroke" />
+                            </div>
+                            <div id="stroke-tool-color-hsl">
+                                <label for="stroke-color-h">H : </label>
+                                <input type="number" name="stroke-color-h" class="color-hsl color-hsl-stroke" id="stroke-color-h" data-mode="stroke" />
+                                <label for="stroke-color-s">S : </label>
+                                <input type="number" name="stroke-color-s" class="color-hsl color-hsl-stroke" id="stroke-color-s" data-mode="stroke" />
+                                <label for="stroke-color-l">L : </label>
+                                <input type="number" name="stroke-color-l" class="color-hsl color-hsl-stroke" id="stroke-color-l" data-mode="stroke" />
+                            </div>
                         </div>
                     </div>
-                    <div id="tool-stroke-color">
-                        <p>Stroke color</p>
-                        <input type="color"  name="color-hexa" class="color-hexa color-hexa-stroke" data-mode="stroke" />
-                        <div id="stroke-tool-color-rgb">
-                            <label for="stroke-color-r">R : </label>
-                            <input type="number" name="stroke-color-r" class="color-rgb color-rgb-stroke" id="stroke-color-r" data-mode="stroke" />
-                            <label for="stroke-color-g">G : </label>
-                            <input type="number" name="stroke-color-g" class="color-rgb color-rgb-stroke" id="stroke-color-g" data-mode="stroke" />
-                            <label for="stroke-color-b">B : </label>
-                            <input type="number" name="stroke-color-b" class="color-rgb color-rgb-stroke" id="stroke-color-b" data-mode="stroke" />
-                        </div>
-                        <div id="stroke-tool-color-hsl">
-                            <label for="stroke-color-h">Hue : </label>
-                            <input type="number" name="stroke-color-h" class="color-hsl color-hsl-stroke" id="stroke-color-h" data-mode="stroke" />
-                            <label for="stroke-color-s">Saturation : </label>
-                            <input type="number" name="stroke-color-s" class="color-hsl color-hsl-stroke" id="stroke-color-s" data-mode="stroke" />
-                            <label for="stroke-color-l">Lightness : </label>
-                            <input type="number" name="stroke-color-l" class="color-hsl color-hsl-stroke" id="stroke-color-l" data-mode="stroke" />
+                </div>
+                <div id="block2">
+                    <div id="layers-block">
+                        <p>Calques</p>
+                        <button id="new-layer">Nouveau Calque</button>
+                        <p>Afficher/Masquer - Activer</p>
+                        <div class="layers-list-holder">
                         </div>
                     </div>
-                </div>
-                <div id="tool-new-layer">
-                    <button id="new-layer">Nouveau Calque</button>
-                </div>
-                <div id="tools-holder">
-                    <!-- <button class="pencil" attr-tool="pencil">Pencil</button> -->
-                </div>
-                <div class="layers-list-holder"></div>
-                <div class="file-upload-holder">
-                    <input type="file" id="image-upload" />
-                </div>
-                <div class="download-holder">
-                    <p>Télécharger !</p>
-                    <button class="download-png">PNG</button>
-                    <button class="download-jpeg">JPEG</button>
-                </div>
-                <div class="export-cmb">
-                    <button id="export-cmb">CMB</button>
-                </div>
-                <div class="online-holder">
-                    <button id="online-switch">Online !</button>
+                    <div class="file-upload-holder">
+                        <p>Importer des images</p>
+                        <input type="file" id="image-upload" />
+                    </div>
+                    <div class="download-holder">
+                        <p>Exporter votre création</p>
+                        <button class="download-png">PNG</button>
+                        <button class="download-jpeg">JPEG</button>
+                    </div>
+                    <div class="export-cmb">
+                        <p>Télécharger le fichier source</p>
+                        <button id="export-cmb">CMB</button>
+                    </div>
+                    <div class="online-holder">
+                        <p>Découvrez les joies du multi</p>
+                        <button id="online-switch">Online !</button>
+                    </div>
                 </div>
             </section>
         </div>
