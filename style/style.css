@@ -61,13 +61,13 @@ body {
 /* header */
 
 .header-wrapper {
-    margin-bottom: 25px;
+    margin-bottom: 10px;
 }
 .main-header {
     text-align: center;
 }
 h1 {
-    font-size: 3em;
+    font-size: 2em;
     color: red;
 }
 

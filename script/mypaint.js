@@ -1030,7 +1030,7 @@
             }
 
             var previousLayer = this.grepOne(this.layers, "order", layer.order - 1);
-            var $previousLayer = $(previousLayer.canva);
+            var $previousLayer = $(previousLayer.canvas);
 
             layer.order = layer.order - 1;
             previousLayer.order = previousLayer.order + 1;
@@ -1051,7 +1051,7 @@
             }
 
             var nextLayer = this.grepOne(this.layers, "order", layer.order + 1);
-            var $nextLayer = $(nextLayer.canva);
+            var $nextLayer = $(nextLayer.canvas);
 
             layer.order = layer.order + 1;
             nextLayer.order = nextLayer.order - 1;
