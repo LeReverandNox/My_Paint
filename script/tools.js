@@ -260,6 +260,7 @@
                     dist.y = this.symPos.y - this.originSym.y;
 
                     this.setContextOptions(this.symLayer.context);
+                    this.symLayer.context.lineJoin = "miter";
 
                     this.symLayer.context.rect(this.originSym.x, this.originSym.y, dist.x, dist.y);
                     if (this.toolFill === true) {
